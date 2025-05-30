@@ -1,5 +1,5 @@
-// Configuração - Substitua pela URL do seu back-end hospedado
-    const API_BASE_URL = 'https://seu-server-gratuito.onrender.com';
+// Configuração
+    const API_BASE_URL = 'https://backend-bdownload.onrender.com';
     
     // Atualiza o ano no footer
     document.getElementById('currentYear').textContent = new Date().getFullYear();
