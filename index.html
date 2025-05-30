@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDownload</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-download"></i> BDownload</h1>
+      <p>Baixe vídeos e áudios de várias plataformas</p>
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <i class="fas fa-moon"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="download-card">
+        <div class="input-group">
+          <input id="url" type="text" placeholder="Cole o link do vídeo aqui..." aria-label="URL do vídeo">
+          <button id="check"><i class="fas fa-search"></i> <span class="btn-text">Ver Qualidades</span></button>
+        </div>
+        
+        <div class="platform-icons">
+          <i class="fab fa-youtube" title="INSERIR O LINK DA URL AQUI"></i>
+          <i class="fab fa-vimeo-v" title="Vimeo"></i>
+          <i class="fab fa-facebook" title="Facebook"></i>
+          <i class="fab fa-instagram" title="Instagram"></i>
+          <i class="fab fa-tiktok" title="TikTok"></i>
+          <i class="fas fa-globe" title="Outros sites"></i>
+        </div>
+      </div>
+
+      <div class="result-container hidden" id="resultContainer">
+        <div class="media-info">
+          <img id="thumb" class="hidden" alt="Miniatura do vídeo" loading="lazy">
+          <div class="media-details">
+            <h3 id="mediaTitle">Título do vídeo</h3>
+            <p id="mediaDuration">Duração: --:--</p>
+          </div>
+        </div>
+
+        <div class="download-options">
+          <h4>Formatos disponíveis:</h4>
+          <select id="formats" size="6" class="hidden" aria-label="Formatos disponíveis"></select>
+          
+          <div class="progress-container hidden" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+          </div>
+          
+          <button id="download" class="hidden"><i class="fas fa-download"></i> <span class="btn-text">Baixar Selecionado</span></button>
+        </div>
+      </div>
+
+      <p id="status" class="status-message" aria-live="polite"></p>
+    </main>
+
+    <footer>
+      <p>BDownload &copy;<span id="currentYear"></span> - Todos os direitos reservados</p>
+      <p class="disclaimer">Este serviço é apenas para fins educacionais</p>
+    </footer>
+  </div>
+<script src="script.js">
+</script>
+</body>
+</html>
