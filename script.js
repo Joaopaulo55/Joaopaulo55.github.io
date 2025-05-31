@@ -1,12 +1,57 @@
 // Configuração
 const API_BASE_URL = 'https://backend-bdownload.onrender.com';
 
-// Atualiza o ano no footer
-document.getElementById('currentYear').textContent = new Date().getFullYear();
-
+// Elementos DOM
 const el = id => document.getElementById(id);
 
-// Toggle dark/light theme
+// Funções de Utilidade
+function showStatus(message, type = 'info') {
+  const status = el('status');
+  status.textContent = message;
+  status.className = 'status-message';
+  
+  ['info', 'success', 'error', 'warning'].forEach(cls => {
+    status.classList.remove(cls);
+  });
+  
+  if (type) status.classList.add(type);
+}
+
+function formatDuration(seconds) {
+  if (!seconds) return '';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return [h, m > 9 ? m : h ? '0' + m : m || '0', s > 9 ? s : '0' + s]
+    .filter(Boolean)
+    .join(':');
+}
+
+function simulateProgress() {
+  let progress = 0;
+  const progressBar = el('progressBar');
+  const progressText = el('progressText');
+  
+  const progressInterval = setInterval(() => {
+    progress += Math.random() * 10;
+    if(progress >= 100) {
+      progress = 100;
+      clearInterval(progressInterval);
+      showStatus('Download concluído com sucesso!', 'success');
+    }
+    progressBar.style.width = `${progress}%`;
+    progressText.textContent = `${Math.round(progress)}%`;
+  }, 300);
+}
+
+function formatDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+// Manipulação de Tema
 el('themeToggle').onclick = () => {
   document.body.classList.toggle('dark-theme');
   const icon = el('themeToggle').querySelector('i');
@@ -19,12 +64,12 @@ el('themeToggle').onclick = () => {
   }
 };
 
-// Verifica o tema salvo
 if (localStorage.getItem('theme') === 'dark') {
   document.body.classList.add('dark-theme');
   el('themeToggle').querySelector('i').classList.replace('fa-moon', 'fa-sun');
 }
 
+// Lógica Principal
 el('check').onclick = async () => {
   const url = el('url').value.trim();
   if(!url) {
@@ -49,13 +94,11 @@ el('check').onclick = async () => {
       throw new Error(data.error || 'Erro ao consultar o vídeo');
     }
     
-    // Preenche os dados
     el('thumb').src = data.thumbnail;
     el('thumb').classList.remove('hidden');
     el('mediaTitle').textContent = data.title || 'Título não disponível';
     el('mediaDuration').textContent = data.duration ? `Duração: ${formatDuration(data.duration)}` : 'Duração não disponível';
     
-    // Preenche a lista de formatos
     if (data.formats && data.formats.length > 0) {
       el('formats').innerHTML = data.formats.map(f =>
         `<option value="${f.id}">
@@ -109,12 +152,10 @@ el('download').onclick = async () => {
     }
     
     if (data.downloadUrl) {
-      // Abre o link de download em nova aba
       window.open(data.downloadUrl, '_blank');
       showStatus('Redirecionando para download...', 'success');
       simulateProgress();
       
-      // Atualiza o botão para "Baixar Novamente"
       setTimeout(() => {
         el('download').innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
       }, 2000);
@@ -129,49 +170,6 @@ el('download').onclick = async () => {
     el('download').innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
   }
 };
-
-// Mostra mensagens de status
-function showStatus(message, type = 'info') {
-  const status = el('status');
-  status.textContent = message;
-  status.className = 'status-message';
-  
-  // Remove todas as classes de tipo anteriores
-  ['info', 'success', 'error', 'warning'].forEach(cls => {
-    status.classList.remove(cls);
-  });
-  
-  if (type) status.classList.add(type);
-}
-
-// Formata a duração de segundos para HH:MM:SS
-function formatDuration(seconds) {
-  if (!seconds) return '';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return [h, m > 9 ? m : h ? '0' + m : m || '0', s > 9 ? s : '0' + s]
-    .filter(Boolean)
-    .join(':');
-}
-
-// Simula barra de progresso (opcional)
-function simulateProgress() {
-  let progress = 0;
-  const progressBar = el('progressBar');
-  const progressText = el('progressText');
-  
-  const progressInterval = setInterval(() => {
-    progress += Math.random() * 10;
-    if(progress >= 100) {
-      progress = 100;
-      clearInterval(progressInterval);
-      showStatus('Download concluído com sucesso!', 'success');
-    }
-    progressBar.style.width = `${progress}%`;
-    progressText.textContent = `${Math.round(progress)}%`;
-  }, 300);
-}
 
 // Plataformas sugeridas
 document.querySelectorAll('.platform-icons i').forEach(icon => {
@@ -191,52 +189,27 @@ document.querySelectorAll('.platform-icons i').forEach(icon => {
   });
 });
 
-// FAQ Functionality - Versão melhorada e testada
-function initFAQ() {
-  const faqQuestions = document.querySelectorAll('.faq-question');
-  
-  faqQuestions.forEach(question => {
-    question.addEventListener('click', function() {
-      // Elementos relevantes
-      const answer = this.nextElementSibling;
-      const icon = this.querySelector('i');
-      
-      // Fecha todas as outras FAQs
-      faqQuestions.forEach(q => {
-        if (q !== question) {
-          q.classList.remove('active');
-          q.nextElementSibling.classList.remove('show');
-          q.querySelector('i').classList.remove('fa-chevron-up');
-          q.querySelector('i').classList.add('fa-chevron-down');
-        }
-      });
-      
-      // Alterna a FAQ clicada
-      this.classList.toggle('active');
-      answer.classList.toggle('show');
-      
-      // Alterna o ícone
-      icon.classList.toggle('fa-chevron-down');
-      icon.classList.toggle('fa-chevron-up');
+// FAQ functionality
+document.querySelectorAll('.faq-question').forEach(question => {
+  question.addEventListener('click', () => {
+    const answer = question.nextElementSibling;
+    const isOpen = question.classList.contains('active');
+    
+    document.querySelectorAll('.faq-question').forEach(q => {
+      if (q !== question) {
+        q.classList.remove('active');
+        q.nextElementSibling.classList.remove('show');
+      }
     });
+    
+    question.classList.toggle('active');
+    answer.classList.toggle('show');
   });
-  
-  // Inicializa o FAQ quando o DOM estiver pronto
-  document.addEventListener('DOMContentLoaded', initFAQ);
-}
+});
 
-// Set current date in format DD/MM/YYYY
-function formatDate(date) {
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+// Inicialização
+document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-// Set current date in terms and privacy pages
 if (document.getElementById('currentDate')) {
   document.getElementById('currentDate').textContent = formatDate(new Date());
 }
-
-// Set current year in footer
-document.getElementById('currentYear').textContent = new Date().getFullYear();
