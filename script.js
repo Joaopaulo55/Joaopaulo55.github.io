@@ -190,3 +190,42 @@ document.querySelectorAll('.platform-icons i').forEach(icon => {
     el('url').focus();
   });
 });
+
+// FAQ functionality
+document.querySelectorAll('.faq-question').forEach(question => {
+  question.addEventListener('click', () => {
+    const answer = question.nextElementSibling;
+    const isOpen = question.classList.contains('active');
+    
+    // Close all other FAQs
+    document.querySelectorAll('.faq-question').forEach(q => {
+      if (q !== question) {
+        q.classList.remove('active');
+        q.nextElementSibling.classList.remove('show');
+      }
+    });
+    
+    // Toggle current FAQ
+    question.classList.toggle('active');
+    answer.classList.toggle('show');
+  });
+});
+
+// Set current year in footer
+document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+// Set current date in format DD/MM/YYYY
+function formatDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+// Set current date in terms and privacy pages
+if (document.getElementById('currentDate')) {
+  document.getElementById('currentDate').textContent = formatDate(new Date());
+}
+
+// Set current year in footer
+document.getElementById('currentYear').textContent = new Date().getFullYear();
