@@ -192,7 +192,38 @@ document.querySelectorAll('.platform-icons i').forEach(icon => {
 });
 
 // FAQ Functionality - Versão melhorada e testada
-
+function initFAQ() {
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  
+  faqQuestions.forEach(question => {
+    question.addEventListener('click', function() {
+      // Elementos relevantes
+      const answer = this.nextElementSibling;
+      const icon = this.querySelector('i');
+      
+      // Fecha todas as outras FAQs
+      faqQuestions.forEach(q => {
+        if (q !== question) {
+          q.classList.remove('active');
+          q.nextElementSibling.classList.remove('show');
+          q.querySelector('i').classList.remove('fa-chevron-up');
+          q.querySelector('i').classList.add('fa-chevron-down');
+        }
+      });
+      
+      // Alterna a FAQ clicada
+      this.classList.toggle('active');
+      answer.classList.toggle('show');
+      
+      // Alterna o ícone
+      icon.classList.toggle('fa-chevron-down');
+      icon.classList.toggle('fa-chevron-up');
+    });
+  });
+  
+  // Inicializa o FAQ quando o DOM estiver pronto
+  document.addEventListener('DOMContentLoaded', initFAQ);
+}
 
 // Set current date in format DD/MM/YYYY
 function formatDate(date) {

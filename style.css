@@ -143,7 +143,6 @@ header p {
 }
 
 /* ========== FAQ ========== */
-
 .faq-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -154,8 +153,6 @@ header p {
   border-radius: 0.75rem;
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid var(--border-color);
-  background-color: var(--card-color);
 }
 
 .faq-item:hover {
@@ -176,22 +173,6 @@ header p {
   align-items: center;
   cursor: pointer;
   gap: 1rem;
-  transition: all 0.3s ease;
-}
-
-/* Ícone da seta */
-.faq-question i {
-  transition: transform 0.3s ease;
-  margin-left: 0.5rem;
-}
-
-/* Estado ativo da pergunta */
-.faq-question.active {
-  background-color: rgba(66, 133, 244, 0.05);
-}
-
-.faq-question.active i {
-  transform: rotate(180deg);
 }
 
 .faq-answer {
@@ -199,22 +180,11 @@ header p {
   max-height: 0;
   overflow: hidden;
   transition: all 0.3s ease;
-  background-color: var(--card-color);
 }
 
 .faq-answer.show {
   padding: 0 1.25rem 1.25rem;
-  max-height: 2000px; /* Valor maior para conteúdo extenso */
-}
-
-/* Conteúdo da resposta */
-.faq-answer-content {
-  padding: 0.5rem 0 1.5rem;
-}
-
-/* Efeito visual quando aberto */
-.faq-item.active {
-  box-shadow: 0 0.25rem 1.5rem rgba(66, 133, 244, 0.1);
+  max-height: 1000px;
 }
 
 /* ========== PÁGINAS LEGAIS ========== */
@@ -311,6 +281,3 @@ footer {
     height: 2.5rem;
   }
 }
-
-
-
