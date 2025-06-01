@@ -784,3 +784,39 @@ footer .disclaimer {
     font-size: 1.2rem;
   }
 }
+
+.bg-card-color {
+  background-color: var(--card-color);
+}
+
+.bg-bg-secondary {
+  background-color: var(--background-color);
+}
+
+.text-text-color {
+  color: var(--text-color);
+}
+
+.text-text-light {
+  color: var(--text-light);
+}
+
+.text-primary-color {
+  color: var(--primary-color);
+}
+
+.text-secondary-color {
+  color: var(--secondary-color);
+}
+
+.border-border-color {
+  border-color: var(--border-color);
+}
+
+.hover\:text-primary-color:hover {
+  color: var(--primary-color);
+}
+
+.hover\:text-secondary-color:hover {
+  color: var(--secondary-color);
+}
