@@ -820,3 +820,50 @@ footer .disclaimer {
 .hover\:text-secondary-color:hover {
   color: var(--secondary-color);
 }
+
+
+/* Logo Animation */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-icon {
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-icon {
+  transform: translateY(-3px);
+}
+
+.logo-text {
+  position: relative;
+}
+
+.logo-text::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.logo:hover .logo-text::after {
+  width: 100%;
+}
+
+/* Accessibility improvements */
+[role="button"] {
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .logo-text::after {
+    display: none;
+  }
+}
