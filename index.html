@@ -97,12 +97,12 @@
           </div>
           
           <div class="platform-icons" aria-label="Plataformas sugeridas">
-            <i class="fab fa-youtube" title="YouTube" role="button"></i>
-            <i class="fab fa-vimeo-v" title="Vimeo" role="button"></i>
-            <i class="fab fa-facebook" title="Facebook" role="button"></i>
-            <i class="fab fa-instagram" title="Instagram" role="button"></i>
-            <i class="fab fa-tiktok" title="TikTok" role="button"></i>
-            <i class="fas fa-globe" title="Outros sites" role="button"></i>
+            <i class="fab fa-youtube" title="YouTube" data-platform="youtube" role="button"></i>
+            <i class="fab fa-vimeo-v" title="Vimeo" data-platform="vimeo" role="button"></i>
+            <i class="fab fa-facebook" title="Facebook" data-platform="facebook" role="button"></i>
+            <i class="fab fa-instagram" title="Instagram" data-platform="instagram" role="button"></i>
+            <i class="fab fa-tiktok" title="TikTok" data-platform="tiktok" role="button"></i>
+            <i class="fas fa-globe" title="Outros sites" data-platform="all" role="button"></i>
           </div>
         </div>
 
@@ -145,6 +145,11 @@
               <span class="btn-text">Baixar Selecionado</span>
             </button>
           </div>
+        </div>
+
+        <div id="searchResults" class="hidden">
+          <h3 class="search-results-title">Resultados da Pesquisa</h3>
+          <div class="search-results-grid" id="searchResultsGrid"></div>
         </div>
 
         <p id="status" class="status-message" aria-live="polite"></p>

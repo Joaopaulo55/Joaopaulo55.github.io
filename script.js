@@ -3,13 +3,19 @@
 // ===========================
 const API_BASE_URL = 'https://backend-bdownload.onrender.com';
 const PLATFORM_URLS = {
-  'YouTube': 'https://youtube.com/watch?v=',
-  'Vimeo': 'https://vimeo.com/',
-  'Facebook': 'https://facebook.com/watch/?v=',
-  'Instagram': 'https://instagram.com/p/',
-  'TikTok': 'https://tiktok.com/@',
-  'Outros sites': 'https://'
+  'youtube': 'https://youtube.com/watch?v=',
+  'vimeo': 'https://vimeo.com/',
+  'facebook': 'https://facebook.com/watch/?v=',
+  'instagram': 'https://instagram.com/p/',
+  'tiktok': 'https://tiktok.com/@',
+  'all': 'https://'
 };
+
+let selectedPlatform = null;
+let debounceTimer = null;
+let lastSearchQuery = '';
+let currentVideoTitle = '';
+
 
 // ===========================
 // Utilitários
@@ -147,6 +153,67 @@ function initPlatformSuggestions() {
       }
     });
   });
+}
+
+async function searchVideos(query) {
+  if (!query || query.length < 3) return;
+  if (query === lastSearchQuery) return;
+  
+  lastSearchQuery = query;
+  showStatus(`Pesquisando por "${query}" no ${selectedPlatform || 'todas as plataformas'}...`, 'info');
+
+  try {
+    const platformParam = selectedPlatform === 'all' ? null : selectedPlatform;
+    const res = await fetch(`${API_BASE_URL}/buscar?q=${encodeURIComponent(query)}${platformParam ? `&platform=${platformParam}` : ''}`);
+    
+    if (!res.ok) {
+      throw new Error('Erro ao buscar vídeos');
+    }
+    
+    const data = await res.json();
+    displaySearchResults(data.resultados);
+    
+  } catch (error) {
+    showStatus(error.message || 'Erro ao buscar vídeos', 'error');
+    console.error('Erro na busca:', error);
+  }
+}
+
+function displaySearchResults(results) {
+  const resultsContainer = el('searchResults');
+  const resultsGrid = el('searchResultsGrid');
+  
+  if (!resultsContainer || !resultsGrid) return;
+
+  if (!results || results.length === 0) {
+    showStatus('Nenhum resultado encontrado', 'warning');
+    resultsContainer.classList.add('hidden');
+    return;
+  }
+
+  resultsGrid.innerHTML = results.map(result => `
+    <div class="search-result-item" data-url="${result.url}">
+      <img src="${result.thumb}" alt="${result.titulo}" class="search-result-thumbnail" loading="lazy">
+      <div class="search-result-info">
+        <div class="search-result-title">${result.titulo}</div>
+        <div class="search-result-channel">${result.canal || 'Canal desconhecido'}</div>
+        <div class="search-result-platform">${result.plataforma}</div>
+        <div class="search-result-duration">${result.duracao || '--:--'}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Adiciona event listeners para os resultados
+  document.querySelectorAll('.search-result-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const url = item.dataset.url;
+      el('url').value = url;
+      checkVideo();
+    });
+  });
+
+  resultsContainer.classList.remove('hidden');
+  showStatus(`${results.length} resultados encontrados`, 'success');
 }
 
 // ===========================
