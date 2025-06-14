@@ -16,7 +16,6 @@ let debounceTimer = null;
 let lastSearchQuery = '';
 let currentVideoTitle = '';
 
-
 // ===========================
 // Utilitários
 // ===========================
@@ -78,6 +77,10 @@ function simulateProgress() {
   }, 300);
 }
 
+function sanitizeFilename(filename) {
+  return filename.replace(/[^a-z0-9áéíóúñü \._-]/gi, '_').substring(0, 100);
+}
+
 // ===========================
 // Componentes
 // ===========================
@@ -106,53 +109,96 @@ function initThemeToggle() {
   }
 }
 
-function initFAQ() {
-  const faqItems = document.querySelectorAll('.faq-item');
-  if (!faqItems.length) return;
-
-  faqItems.forEach(item => {
-    const question = item.querySelector('.faq-question');
-    const answer = item.querySelector('.faq-answer');
-    const icon = question?.querySelector('i');
-    
-    if (!question || !answer) return;
-
-    question.addEventListener('click', () => {
-      const isActive = question.classList.contains('active');
-      
-      // Fecha todos os outros itens
-      faqItems.forEach(otherItem => {
-        otherItem.querySelector('.faq-question')?.classList.remove('active');
-        otherItem.querySelector('.faq-answer')?.classList.remove('show');
-        const otherIcon = otherItem.querySelector('.faq-question i');
-        if (otherIcon) otherIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      });
-      
-      // Abre o item atual se não estiver ativo
-      if (!isActive) {
-        question.classList.add('active');
-        answer.classList.add('show');
-        if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-      }
-    });
-  });
-}
-
-function initPlatformSuggestions() {
+function initPlatformSelection() {
   const platformIcons = document.querySelectorAll('.platform-icons i');
   if (!platformIcons.length) return;
 
   platformIcons.forEach(icon => {
     icon.addEventListener('click', () => {
-      const platform = icon.title.replace('INSERIR O LINK DA URL AQUI', 'YouTube');
-      const urlInput = el('url');
+      // Remove a classe 'selected' de todos os ícones
+      platformIcons.forEach(i => i.classList.remove('selected'));
       
+      // Adiciona a classe 'selected' apenas ao ícone clicado
+      icon.classList.add('selected');
+      
+      // Define a plataforma selecionada
+      selectedPlatform = icon.dataset.platform;
+      
+      // Foca no input de URL
+      const urlInput = el('url');
       if (urlInput) {
-        urlInput.value = PLATFORM_URLS[platform] || '';
         urlInput.focus();
+        urlInput.placeholder = `Pesquise vídeos no ${icon.title} ou cole um link...`;
       }
     });
   });
+}
+
+function initAutoCheck() {
+  const urlInput = el('url');
+  if (!urlInput) return;
+
+  urlInput.addEventListener('input', () => {
+    const url = urlInput.value.trim();
+    
+    // Se for um URL válido, verifica automaticamente após um pequeno atraso
+    if (url.match(/^https?:\/\/.+\..+/)) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        checkVideo();
+      }, 1000);
+    }
+  });
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const url = urlInput.value.trim();
+      
+      if (url.match(/^https?:\/\/.+\..+/)) {
+        checkVideo();
+      } else if (selectedPlatform && url.length > 2) {
+        searchVideos(url);
+      }
+    }
+  });
+}
+
+async function searchVideos(query) {
+  if (!query || query.length < 3) return;
+  if (query === lastSearchQuery) return;
+  
+  lastSearchQuery = query;
+  showStatus(`Pesquisando por "${query}" no ${selectedPlatform}...`, 'info');
+
+  try {
+    // Simulação de busca - na implementação real, você faria uma requisição para uma API de busca
+    const mockResults = generateMockResults(query, selectedPlatform);
+    displaySearchResults(mockResults);
+  } catch (error) {
+    showStatus('Erro ao buscar vídeos', 'error');
+    console.error('Erro na busca:', error);
+  }
+}
+
+function generateMockResults(query, platform) {
+  // Esta é uma função de simulação - na implementação real, você usaria uma API de busca
+  const results = [];
+  const platforms = platform === 'all' ? ['youtube', 'vimeo', 'facebook', 'instagram', 'tiktok'] : [platform];
+  
+  platforms.forEach(p => {
+    for (let i = 1; i <= 6; i++) {
+      results.push({
+        id: `${p}_${i}`,
+        title: `${query} - Resultado ${i} no ${p}`,
+        thumbnail: `https://via.placeholder.com/300x200?text=${p}+${i}`,
+        duration: Math.floor(Math.random() * 600) + 60,
+        channel: `Canal ${i}`,
+        url: `${PLATFORM_URLS[p]}${p}_video_${i}`
+      });
+    }
+  });
+
+  return results;
 }
 
 async function searchVideos(query) {
@@ -216,6 +262,54 @@ function displaySearchResults(results) {
   showStatus(`${results.length} resultados encontrados`, 'success');
 }
 
+function initFilenameInput() {
+  const downloadButton = el('download');
+  if (!downloadButton) return;
+
+  downloadButton.addEventListener('click', () => {
+    const formats = el('formats');
+    if (!formats) return;
+
+    const selectedFormat = formats.options[formats.selectedIndex];
+    if (!selectedFormat) return;
+
+    // Cria o input para o nome do arquivo se não existir
+    let filenameContainer = document.querySelector('.filename-input-container');
+    if (!filenameContainer) {
+      filenameContainer = document.createElement('div');
+      filenameContainer.className = 'filename-input-container';
+      
+      const filenameInput = document.createElement('input');
+      filenameInput.type = 'text';
+      filenameInput.className = 'filename-input';
+      filenameInput.placeholder = 'Nome do arquivo (sem extensão)';
+      filenameInput.value = sanitizeFilename(currentVideoTitle);
+      
+      const charCounter = document.createElement('div');
+      charCounter.className = 'char-counter';
+      charCounter.textContent = `${filenameInput.value.length}/100 caracteres`;
+      
+      filenameInput.addEventListener('input', () => {
+        const value = filenameInput.value;
+        charCounter.textContent = `${value.length}/100 caracteres`;
+        if (value.length > 90) {
+          charCounter.classList.add('warning');
+        } else {
+          charCounter.classList.remove('warning');
+        }
+      });
+      
+      filenameContainer.appendChild(filenameInput);
+      filenameContainer.appendChild(charCounter);
+      
+      // Insere antes do botão de download
+      downloadButton.parentNode.insertBefore(filenameContainer, downloadButton);
+    }
+    
+    filenameContainer.style.display = 'block';
+  });
+}
+
 // ===========================
 // Lógica Principal
 // ===========================
@@ -268,6 +362,10 @@ function updateVideoInfoUI(data) {
   const formats = el('formats');
   const downloadButton = el('download');
   const resultContainer = el('resultContainer');
+  const searchResults = el('searchResults');
+  
+  // Esconde os resultados de pesquisa se estiverem visíveis
+  if (searchResults) searchResults.classList.add('hidden');
   
   if (thumb) {
     thumb.src = data.thumbnail || '';
@@ -276,6 +374,7 @@ function updateVideoInfoUI(data) {
   
   if (title) {
     title.textContent = data.title || 'Título não disponível';
+    currentVideoTitle = data.title || 'video';
   }
   
   if (duration) {
@@ -286,6 +385,7 @@ function updateVideoInfoUI(data) {
     cookieStatus.innerHTML = data.cookies ? 
       `<i class="fas ${data.cookies === 'válidos' ? 'fa-check-circle text-green' : 'fa-exclamation-triangle text-red'}"></i> Cookies ${data.cookies}` : 
       '';
+    cookieStatus.classList.remove('hidden');
   }
   
   if (formats && data.formats && data.formats.length > 0) {
@@ -310,6 +410,7 @@ async function downloadVideo() {
   const formats = el('formats');
   const downloadButton = el('download');
   const progressContainer = el('progressContainer');
+  const filenameInput = document.querySelector('.filename-input');
   
   if (!urlInput || !formats || !downloadButton) return;
 
@@ -340,7 +441,14 @@ async function downloadVideo() {
     }
     
     if (data.downloadUrl) {
-      window.open(data.downloadUrl, '_blank');
+      // Adiciona o nome do arquivo personalizado se existir
+      let downloadUrl = data.downloadUrl;
+      if (filenameInput && filenameInput.value.trim()) {
+        const filename = sanitizeFilename(filenameInput.value.trim());
+        downloadUrl += `&filename=${encodeURIComponent(filename)}`;
+      }
+      
+      window.open(downloadUrl, '_blank');
       showStatus('Redirecionando para download...', 'success');
       simulateProgress();
       
@@ -379,8 +487,9 @@ function initPage() {
 
   // Inicializa componentes
   initThemeToggle();
-  initFAQ();
-  initPlatformSuggestions();
+  initPlatformSelection();
+  initAutoCheck();
+  initFilenameInput();
 
   // Configura eventos
   const checkButton = el('check');
