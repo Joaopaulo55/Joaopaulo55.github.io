@@ -16,6 +16,11 @@ let debounceTimer = null;
 let lastSearchQuery = '';
 let currentVideoTitle = '';
 
+function handleBrokenImage(img) {
+  img.onerror = null;
+  img.src = 'https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel';
+}
+
 // ===========================
 // Utilitários
 // ===========================
@@ -163,43 +168,6 @@ function initAutoCheck() {
   });
 }
 
-async function searchVideos(query) {
-  if (!query || query.length < 3) return;
-  if (query === lastSearchQuery) return;
-  
-  lastSearchQuery = query;
-  showStatus(`Pesquisando por "${query}" no ${selectedPlatform}...`, 'info');
-
-  try {
-    // Simulação de busca - na implementação real, você faria uma requisição para uma API de busca
-    const mockResults = generateMockResults(query, selectedPlatform);
-    displaySearchResults(mockResults);
-  } catch (error) {
-    showStatus('Erro ao buscar vídeos', 'error');
-    console.error('Erro na busca:', error);
-  }
-}
-
-function generateMockResults(query, platform) {
-  // Esta é uma função de simulação - na implementação real, você usaria uma API de busca
-  const results = [];
-  const platforms = platform === 'all' ? ['youtube', 'vimeo', 'facebook', 'instagram', 'tiktok'] : [platform];
-  
-  platforms.forEach(p => {
-    for (let i = 1; i <= 6; i++) {
-      results.push({
-        id: `${p}_${i}`,
-        title: `${query} - Resultado ${i} no ${p}`,
-        thumbnail: `https://via.placeholder.com/300x200?text=${p}+${i}`,
-        duration: Math.floor(Math.random() * 600) + 60,
-        channel: `Canal ${i}`,
-        url: `${PLATFORM_URLS[p]}${p}_video_${i}`
-      });
-    }
-  });
-
-  return results;
-}
 
 async function searchVideos(query) {
   if (!query || query.length < 3) return;
@@ -239,7 +207,7 @@ function displaySearchResults(results) {
 
   resultsGrid.innerHTML = results.map(result => `
     <div class="search-result-item" data-url="${result.url}">
-      <img src="${result.thumb}" alt="${result.titulo}" class="search-result-thumbnail" loading="lazy">
+      <img src="${result.thumb}" alt="${result.titulo}" class="search-result-thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel'">
       <div class="search-result-info">
         <div class="search-result-title">${result.titulo}</div>
         <div class="search-result-channel">${result.canal || 'Canal desconhecido'}</div>
@@ -262,53 +230,7 @@ function displaySearchResults(results) {
   showStatus(`${results.length} resultados encontrados`, 'success');
 }
 
-function initFilenameInput() {
-  const downloadButton = el('download');
-  if (!downloadButton) return;
 
-  downloadButton.addEventListener('click', () => {
-    const formats = el('formats');
-    if (!formats) return;
-
-    const selectedFormat = formats.options[formats.selectedIndex];
-    if (!selectedFormat) return;
-
-    // Cria o input para o nome do arquivo se não existir
-    let filenameContainer = document.querySelector('.filename-input-container');
-    if (!filenameContainer) {
-      filenameContainer = document.createElement('div');
-      filenameContainer.className = 'filename-input-container';
-      
-      const filenameInput = document.createElement('input');
-      filenameInput.type = 'text';
-      filenameInput.className = 'filename-input';
-      filenameInput.placeholder = 'Nome do arquivo (sem extensão)';
-      filenameInput.value = sanitizeFilename(currentVideoTitle);
-      
-      const charCounter = document.createElement('div');
-      charCounter.className = 'char-counter';
-      charCounter.textContent = `${filenameInput.value.length}/100 caracteres`;
-      
-      filenameInput.addEventListener('input', () => {
-        const value = filenameInput.value;
-        charCounter.textContent = `${value.length}/100 caracteres`;
-        if (value.length > 90) {
-          charCounter.classList.add('warning');
-        } else {
-          charCounter.classList.remove('warning');
-        }
-      });
-      
-      filenameContainer.appendChild(filenameInput);
-      filenameContainer.appendChild(charCounter);
-      
-      // Insere antes do botão de download
-      downloadButton.parentNode.insertBefore(filenameContainer, downloadButton);
-    }
-    
-    filenameContainer.style.display = 'block';
-  });
-}
 
 // ===========================
 // Lógica Principal
@@ -364,11 +286,11 @@ function updateVideoInfoUI(data) {
   const resultContainer = el('resultContainer');
   const searchResults = el('searchResults');
   
-  // Esconde os resultados de pesquisa se estiverem visíveis
   if (searchResults) searchResults.classList.add('hidden');
   
   if (thumb) {
-    thumb.src = data.thumbnail || '';
+    thumb.src = data.thumbnail || 'https://via.placeholder.com/300x200?text=Sem+thumbnail';
+    thumb.onerror = () => handleBrokenImage(thumb);
     thumb.classList.remove('hidden');
   }
   
@@ -410,7 +332,6 @@ async function downloadVideo() {
   const formats = el('formats');
   const downloadButton = el('download');
   const progressContainer = el('progressContainer');
-  const filenameInput = document.querySelector('.filename-input');
   
   if (!urlInput || !formats || !downloadButton) return;
 
@@ -441,14 +362,7 @@ async function downloadVideo() {
     }
     
     if (data.downloadUrl) {
-      // Adiciona o nome do arquivo personalizado se existir
-      let downloadUrl = data.downloadUrl;
-      if (filenameInput && filenameInput.value.trim()) {
-        const filename = sanitizeFilename(filenameInput.value.trim());
-        downloadUrl += `&filename=${encodeURIComponent(filename)}`;
-      }
-      
-      window.open(downloadUrl, '_blank');
+      window.open(data.downloadUrl, '_blank');
       showStatus('Redirecionando para download...', 'success');
       simulateProgress();
       
@@ -489,7 +403,7 @@ function initPage() {
   initThemeToggle();
   initPlatformSelection();
   initAutoCheck();
-  initFilenameInput();
+  
 
   // Configura eventos
   const checkButton = el('check');
