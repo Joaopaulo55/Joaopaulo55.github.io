@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Ferramenta educacional para visualizar e converter conteúdos públicos com licenças Creative Commons">
-  <title>BDownload - Ferramenta Educacional</title>
+  <title>BDownload</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5705824723265662"
      crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,174 +13,137 @@
 <body>
   <div class="container">
     <header>
-  <h1 class="logo">
-    <i class="fas fa-download logo-icon"></i> 
-    <span class="logo-text">BDownload</span>
-  </h1>
-  <p>Ferramenta educacional para visualizar e converter conteúdos públicos</p>
-  <div class="header-links">
-    <a href="https://www.facebook.com/profile.php?id=61577235291224" target="_blank" rel="noopener noreferrer" aria-label="Nosso Facebook">
-      <i class="fab fa-facebook"></i>
-    </a>
-    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
-      <i class="fas fa-moon"></i>
-    </button>
-  </div>
-</header>
+      <h1><i class="fas fa-download"></i> BDownload</h1>
+       <p>Ferramenta educacional para visualizar e converter conteúdos públicos</p>
+       <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <i class="fas fa-moon"></i>
+      </button>
+    </header>
 
     <main>
-      <section class="tutorial-section" aria-labelledby="tutorial-title">
-        <h2 id="tutorial-title"><i class="fas fa-graduation-cap"></i> Tutorial Educacional</h2>
-        
-        <div class="tutorial-steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h3>Encontre Conteúdo Educacional</h3>
-              <p>Busque vídeos e materiais marcados como Creative Commons em plataformas educacionais como YouTube EDU, Vimeo Education ou repositórios acadêmicos.</p>
-            </div>
-          </div>
-          
-          <div class="step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h3>Verifique a Licença</h3>
-              <p>Confirme que o conteúdo tem licença CC-BY, CC-BY-SA ou similar. Evite materiais com direitos autorais restritos.</p>
-            </div>
-          </div>
-          
-          <div class="step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h3>Cole o Link no BDownload</h3>
-              <p>Insira o URL do conteúdo público na caixa abaixo para ver as opções de download disponíveis.</p>
-            </div>
-          </div>
-          
-          <div class="step">
-            <div class="step-number">4</div>
-            <div class="step-content">
-              <h3>Baixe para Estudo Offline</h3>
-              <p>Selecione o formato adequado para seu uso educacional (vídeo completo, apenas áudio para podcasts, ou qualidade reduzida para economizar espaço).</p>
-            </div>
-          </div>
-          
-          <div class="step">
-            <div class="step-number">5</div>
-            <div class="step-content">
-              <h3>Use Responsavelmente</h3>
-              <p>Dê crédito ao criador original em seus trabalhos e não redistribua comercialmente. Use apenas para fins educacionais.</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="educational-resources">
-          <h3><i class="fas fa-book-open"></i> Recursos Educacionais Recomendados</h3>
-          <ul>
-            <li><a href="https://creativecommons.org/about/cclicenses/" target="_blank" rel="noopener noreferrer">Guia de Licenças Creative Commons</a></li>
-            <li><a href="https://www.youtube.com/edu" target="_blank" rel="noopener noreferrer">YouTube EDU</a></li>
-            <li><a href="https://vimeo.com/education" target="_blank" rel="noopener noreferrer">Vimeo Education</a></li>
-            <li><a href="https://oercommons.org/" target="_blank" rel="noopener noreferrer">Repositório OER Commons</a></li>
-          </ul>
-        </div>
-      </section>
-      
-      <section aria-labelledby="download-section-title">
-        <div class="download-card">
-          <div class="input-group">
-            <input 
-              id="url" 
-              type="text" 
-              placeholder="Cole aqui o link de um conteúdo público (Creative Commons)..." 
-              aria-label="URL do conteúdo"
-            >  
-            <button id="check" aria-label="Verificar qualidades disponíveis">
-              <i class="fas fa-search"></i> 
-              <span class="btn-text">Ver Qualidades</span>
-            </button>
-          </div>
-          
-          <div class="platform-icons" aria-label="Plataformas sugeridas">
-            <i class="fab fa-youtube" title="YouTube" data-platform="youtube" role="button"></i>
-            <i class="fab fa-vimeo-v" title="Vimeo" data-platform="vimeo" role="button"></i>
-            <i class="fab fa-facebook" title="Facebook" data-platform="facebook" role="button"></i>
-            <i class="fab fa-instagram" title="Instagram" data-platform="instagram" role="button"></i>
-            <i class="fab fa-tiktok" title="TikTok" data-platform="tiktok" role="button"></i>
-            <i class="fas fa-globe" title="Outros sites" data-platform="all" role="button"></i>
-          </div>
-        </div>
-
-        <div class="result-container hidden" id="resultContainer" aria-live="polite">
-          <div class="media-info">
-            <img 
-              id="thumb" 
-              class="hidden" 
-              alt="Miniatura do vídeo" 
-              loading="lazy"
-              aria-hidden="true"
-            >
-            <div class="media-details">
-              <h3 id="mediaTitle">Título do vídeo</h3>
-              <p id="mediaDuration">Duração: --:--</p>
-              <p id="cookieStatus" class="hidden"></p>
-            </div>
-          </div>
-
-          <div class="download-options">
-            <h4>Formatos disponíveis:</h4>
-            <select 
-              id="formats" 
-              size="6" 
-              class="hidden" 
-              aria-label="Formatos disponíveis para download"
-            ></select>
-            
-            <div class="progress-container hidden" id="progressContainer">
-              <div class="progress-bar" id="progressBar" role="progressbar"></div>
-              <span class="progress-text" id="progressText">0%</span>
-            </div>
-            
-            <button 
-              id="download" 
-              class="hidden"
-              aria-label="Baixar formato selecionado"
-            >
-              <i class="fas fa-download"></i> 
-              <span class="btn-text">Baixar Selecionado</span>
-            </button>
-          </div>
-        </div>
-
-        
-<div id="searchResults" class="hidden">
-  <h3 class="search-results-title">Resultados da Pesquisa</h3>
-  <div class="search-results-grid" id="searchResultsGrid"></div>
-</div>
-
-        <p id="status" class="status-message" aria-live="polite"></p>
-      </section>
-      
-      <section id="noticias" class="bg-card-color rounded-lg shadow-md p-6 mb-6 border border-border-color" aria-labelledby="news-title">
-        <h2 id="news-title" class="text-primary-color text-xl font-bold mb-4 flex items-center gap-2">
-          <i class="fas fa-newspaper"></i> Notícias da sua região
-        </h2>
-        <div id="lista-noticias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </section>
-    </main>
-    
-    <footer>
-      <div class="footer-links">
-        <a href="index.html">Página Inicial</a>
-        <a href="faq.html">FAQ</a>
-        <a href="politica.html">Política de Privacidade</a>
-        <a href="termos.html">Termos de Uso</a>
+       <section class="tutorial-section">
+  <h2><i class="fas fa-graduation-cap"></i> Tutorial Educacional</h2>
+  
+  <div class="tutorial-steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h3>Encontre Conteúdo Educacional</h3>
+        <p>Busque vídeos e materiais marcados como Creative Commons em plataformas educacionais como YouTube EDU, Vimeo Education ou repositórios acadêmicos.</p>
       </div>
-      <p>BDownload &copy;<span id="currentYear"></span> - Ferramenta educacional</p>
-      <p class="disclaimer">Aviso: Este site é destinado exclusivamente a fins educacionais e não incentiva a violação de direitos autorais. O uso é de responsabilidade do usuário.</p>
-    </footer>
+    </div>
+    
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <h3>Verifique a Licença</h3>
+        <p>Confirme que o conteúdo tem licença CC-BY, CC-BY-SA ou similar. Evite materiais com direitos autorais restritos.</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <h3>Cole o Link no BDownload</h3>
+        <p>Insira o URL do conteúdo público na caixa abaixo para ver as opções de download disponíveis.</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <h3>Baixe para Estudo Offline</h3>
+        <p>Selecione o formato adequado para seu uso educacional (vídeo completo, apenas áudio para podcasts, ou qualidade reduzida para economizar espaço).</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-content">
+        <h3>Use Responsavelmente</h3>
+        <p>Dê crédito ao criador original em seus trabalhos e não redistribua comercialmente. Use apenas para fins educacionais.</p>
+      </div>
+    </div>
   </div>
   
-  <script src="script.js"></script>
-  <script src="News.js"></script>
+  <div class="educational-resources">
+    <h3><i class="fas fa-book-open"></i> Recursos Educacionais Recomendados</h3>
+    <ul>
+      <li><a href="https://creativecommons.org/about/cclicenses/" target="_blank">Guia de Licenças Creative Commons</a></li>
+      <li><a href="https://www.youtube.com/edu" target="_blank">YouTube EDU</a></li>
+      <li><a href="https://vimeo.com/education" target="_blank">Vimeo Education</a></li>
+      <li><a href="https://oercommons.org/" target="_blank">Repositório OER Commons</a></li>
+    </ul>
+  </div>
+</section>
+       
+       
+      <div class="download-card">
+        <div class="input-group">
+         <input id="url" type="text" placeholder="Cole aqui o link de um conteúdo público (Creative Commons)...">  
+           <button id="check"><i class="fas fa-search"></i> <span class="btn-text">Ver Qualidades</span></button>
+        </div>
+        
+        <div class="platform-icons">
+          <i class="fab fa-youtube" title="INSERIR O LINK DA URL AQUI"></i>
+          <i class="fab fa-vimeo-v" title="Vimeo"></i>
+          <i class="fab fa-facebook" title="Facebook"></i>
+          <i class="fab fa-instagram" title="Instagram"></i>
+          <i class="fab fa-tiktok" title="TikTok"></i>
+          <i class="fas fa-globe" title="Outros sites"></i>
+        </div>
+      </div>
+
+      <div class="result-container hidden" id="resultContainer">
+        <div class="media-info">
+          <img id="thumb" class="hidden" alt="Miniatura do vídeo" loading="lazy">
+          <div class="media-details">
+            <h3 id="mediaTitle">Título do vídeo</h3>
+            <p id="mediaDuration">Duração: --:--</p>
+          </div>
+        </div>
+
+        <div class="download-options">
+          <h4>Formatos disponíveis:</h4>
+          <select id="formats" size="6" class="hidden" aria-label="Formatos disponíveis"></select>
+          
+          <div class="progress-container hidden" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+          </div>
+          
+          <button id="download" class="hidden"><i class="fas fa-download"></i> <span class="btn-text">Baixar Selecionado</span></button>
+        </div>
+      </div>
+
+      <p id="status" class="status-message" aria-live="polite"></p>
+    </main>
+
+     
+     <div id="noticias" class="bg-card-color rounded-lg shadow-md p-6 mb-6 border border-border-color">
+  <h2 class="text-primary-color text-xl font-bold mb-4 flex items-center gap-2">
+    <i class="fas fa-newspaper"></i> Notícias da sua região
+  </h2>
+  <div id="lista-noticias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</div>
+
+     
+     
+     
+    <footer>
+  <div class="footer-links">
+    <a href="index.html">Página Inicial</a>
+    <a href="faq.html">FAQ</a>
+    <a href="politica.html">Política de Privacidade</a>
+    <a href="termos.html">Termos de Uso</a>
+  </div>
+  <p>BDownload &copy;<span id="currentYear"></span> - Ferramenta educacional</p>
+  <p class="disclaimer">Aviso: Este site é destinado exclusivamente a fins educacionais e não incentiva a violação de direitos autorais. O uso é de responsabilidade do usuário.</p>
+</footer>
+  </div>
+<script src="script.js">
+</script>
+<script src="News.js">
+</script>
 </body>
 </html>
