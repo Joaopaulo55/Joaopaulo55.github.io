@@ -290,7 +290,10 @@ function updateVideoInfoUI(data) {
   
   if (thumb) {
     thumb.src = data.thumbnail || 'https://via.placeholder.com/300x200?text=Sem+thumbnail';
-    thumb.onerror = () => handleBrokenImage(thumb);
+    thumb.onerror = function() {
+      this.onerror = null;
+      this.src = 'https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel';
+    };
     thumb.classList.remove('hidden');
   }
   
