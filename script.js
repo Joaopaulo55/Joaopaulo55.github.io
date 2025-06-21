@@ -10,6 +10,16 @@ const PLATFORM_URLS = {
   'tiktok': 'https://tiktok.com/@',
   'all': 'https://'
 };
+const fetchWithTimeout = async (url, options = {}, timeout = 15000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const response = await fetch(url, {
+    ...options,
+    signal: controller.signal  
+  });
+  clearTimeout(id);
+  return response;
+};
 
 let selectedPlatform = null;
 let debounceTimer = null;
@@ -80,6 +90,11 @@ function simulateProgress() {
     progressBar.style.width = `${progress}%`;
     progressText.textContent = `${Math.round(progress)}%`;
   }, 300);
+
+  // Timeout de segurança
+  setTimeout(() => {
+    clearInterval(progressInterval);
+  }, 10000); // 10 segundos
 }
 
 function sanitizeFilename(filename) {
@@ -113,6 +128,51 @@ function initThemeToggle() {
     if (icon) icon.classList.replace('fa-moon', 'fa-sun');
   }
 }
+
+function initTutorialAccordion() {
+    const tutorialHeader = document.getElementById('tutorialHeader');
+    const tutorialContent = document.getElementById('tutorialContent');
+    const tutorialToggle = tutorialHeader?.querySelector('.tutorial-toggle i');
+    
+    if (tutorialHeader && tutorialContent && tutorialToggle) {
+        tutorialHeader.addEventListener('click', function() {
+            tutorialContent.classList.toggle('show');
+            
+            if (tutorialContent.classList.contains('show')) {
+                tutorialToggle.classList.remove('fa-chevron-down');
+                tutorialToggle.classList.add('fa-chevron-up');
+                tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'none';
+            } else {
+                tutorialToggle.classList.remove('fa-chevron-up');
+                tutorialToggle.classList.add('fa-chevron-down');
+                tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'pulse 2s infinite';
+            }
+        });
+    }
+}
+
+function initScrollToTop() {
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    
+    if (scrollToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+}
+
+
 
 function initPlatformSelection() {
   const platformIcons = document.querySelectorAll('.platform-icons i');
@@ -178,18 +238,35 @@ async function searchVideos(query) {
 
   try {
     const platformParam = selectedPlatform === 'all' ? null : selectedPlatform;
-    const res = await fetch(`${API_BASE_URL}/buscar?q=${encodeURIComponent(query)}${platformParam ? `&platform=${platformParam}` : ''}`);
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/buscar?q=${encodeURIComponent(query)}${platformParam ? `&platform=${platformParam}` : ''}`,
+      {}, // options
+      10000 // timeout de 10 segundos
+    );
     
-    if (!res.ok) {
-      throw new Error('Erro ao buscar vídeos');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.erro || 'Erro ao buscar vídeos');
     }
     
-    const data = await res.json();
+    const data = await response.json();
+    
+    if (!data.resultados || data.resultados.length === 0) {
+      throw new Error('Nenhum resultado encontrado');
+    }
+    
     displaySearchResults(data.resultados);
     
   } catch (error) {
     showStatus(error.message || 'Erro ao buscar vídeos', 'error');
     console.error('Erro na busca:', error);
+    
+    // Limpa resultados em caso de erro
+    const resultsGrid = el('searchResultsGrid');
+    if (resultsGrid) resultsGrid.innerHTML = '';
+    
+    const resultsContainer = el('searchResults');
+    if (resultsContainer) resultsContainer.classList.add('hidden');
   }
 }
 
@@ -232,6 +309,9 @@ function displaySearchResults(results) {
 
 
 
+
+
+
 // ===========================
 // Lógica Principal
 // ===========================
@@ -252,7 +332,7 @@ async function checkVideo() {
   checkButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/formats`, {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/formats`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -307,29 +387,77 @@ function updateVideoInfoUI(data) {
   }
   
   if (cookieStatus) {
-    cookieStatus.innerHTML = data.cookies ? 
-      `<i class="fas ${data.cookies === 'válidos' ? 'fa-check-circle text-green' : 'fa-exclamation-triangle text-red'}"></i> Cookies ${data.cookies}` : 
-      '';
+    const hasCookies = data.cookies === 'válidos';
+    cookieStatus.innerHTML = `
+      <i class="fas ${hasCookies ? 'fa-check-circle text-green' : 'fa-exclamation-triangle text-yellow'}"></i> 
+      ${hasCookies ? 'Acesso premium disponível' : 'Acesso limitado (sem cookies)'}
+    `;
+    
+    if (!hasCookies) {
+      showStatus('Para acessar formatos premium, atualize os cookies no servidor', 'warning');
+    }
     cookieStatus.classList.remove('hidden');
   }
   
   if (formats && data.formats && data.formats.length > 0) {
-    formats.innerHTML = data.formats.map(f =>
-      `<option value="${f.id}">
-        ${f.resolution?.padEnd(6) || 'Áudio'} | ${f.ext} | ${f.vcodec !== 'none' ? 'Vídeo' : ''}${f.vcodec !== 'none' && f.acodec !== 'none' ? ' + ' : ''}${f.acodec !== 'none' ? 'Áudio' : ''}
-      </option>`
-    ).join('');
+    // Ordenar formatos
+    const sortedFormats = data.formats.sort((a, b) => {
+      const aScore = (a.vcodec !== 'none' ? 2 : 0) + (a.acodec !== 'none' ? 1 : 0);
+      const bScore = (b.vcodec !== 'none' ? 2 : 0) + (b.acodec !== 'none' ? 1 : 0);
+      return bScore - aScore;
+    });
+    
+    formats.innerHTML = sortedFormats.map(f => {
+      const isVideo = f.vcodec !== 'none';
+      const isAudio = f.acodec !== 'none';
+      let type = '';
+      
+      if (isVideo && isAudio) type = 'Vídeo + Áudio';
+      else if (isVideo) type = 'Apenas Vídeo';
+      else if (isAudio) type = 'Apenas Áudio';
+      
+      return `<option value="${f.id}">
+        ${f.resolution?.padEnd(6) || 'Áudio'} | ${f.ext.toUpperCase()} | ${type}
+        ${f.filesize ? `| ${formatFileSize(f.filesize)}` : ''}
+      </option>`;
+    }).join('');
     
     formats.classList.remove('hidden');
     if (downloadButton) downloadButton.classList.remove('hidden');
     showStatus('Selecione o formato e baixe!', 'success');
-  } else {
-    showStatus('Nenhum formato disponível encontrado', 'warning');
   }
   
   if (resultContainer) resultContainer.classList.remove('hidden');
 }
 
+
+// ===========================
+// Função Auxiliar
+// ===========================
+function formatFileSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function initCopyButton() {
+  const copyBtn = el('copyUrl');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const urlInput = el('url');
+      if (urlInput) {
+        urlInput.select();
+        document.execCommand('copy');
+        showStatus('URL copiada para a área de transferência!', 'success');
+      }
+    });
+  }
+}
+
+// ===========================
+// Lógica Principal (continuação)
+// ===========================
 async function downloadVideo() {
   const urlInput = el('url');
   const formats = el('formats');
@@ -352,34 +480,21 @@ async function downloadVideo() {
   if (progressContainer) progressContainer.classList.remove('hidden');
 
   try {
-    const res = await fetch(`${API_BASE_URL}/download`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, format: fmtId })
-    });
+    const redirectUrl = `${API_BASE_URL}/redirect-download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(fmtId)}`;
+    window.open(redirectUrl, '_blank');
     
-    const data = await res.json();
+    showStatus('Redirecionando para download...', 'success');
+    simulateProgress();
     
-    if (!res.ok) {
-      throw new Error(data.error || 'Erro ao preparar download');
-    }
-    
-    if (data.downloadUrl) {
-      window.open(data.downloadUrl, '_blank');
-      showStatus('Redirecionando para download...', 'success');
-      simulateProgress();
-      
-      // Atualiza o botão para "Baixar Novamente"
-      setTimeout(() => {
-        downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
-      }, 2000);
-    } else {
-      throw new Error('URL de download não recebida');
-    }
+    setTimeout(() => {
+      downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
+    }, 2000);
     
   } catch (error) {
     showStatus(error.message || 'Erro durante o download', 'error');
     console.error('Erro no download:', error);
+    const progressBar = el('progressBar');
+    if (progressBar) progressBar.style.width = '0%';
   } finally {
     downloadButton.disabled = false;
     downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
@@ -406,7 +521,9 @@ function initPage() {
   initThemeToggle();
   initPlatformSelection();
   initAutoCheck();
-  
+  initTutorialAccordion();
+  initScrollToTop();
+  initCopyButton();
 
   // Configura eventos
   const checkButton = el('check');
