@@ -8,6 +8,32 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos para os anúncios */
+    .ad-container {
+      margin: 20px auto;
+      padding: 10px;
+      text-align: center;
+      background: rgba(0,0,0,0.03);
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    
+    .ad-top {
+      margin-top: 0;
+    }
+    
+    .ad-middle {
+      margin: 30px auto;
+    }
+    
+    @media (max-width: 768px) {
+      .ad-container {
+        padding: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -21,6 +47,20 @@
         <span class="theme-label">Modo Escuro</span>
       </button>
     </header>
+
+    <!-- Anúncio Topo -->
+    <div class="ad-container ad-top">
+      <script type="text/javascript">
+        atOptions = {
+          'key': 'cfe688e5fcfcf4c2d4e679f0241bdad6',
+          'format': 'iframe',
+          'height': 50,
+          'width': 320,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/cfe688e5fcfcf4c2d4e679f0241bdad6/invoke.js" async></script>
+    </div>
 
     <main>
       <section class="tutorial-section">
@@ -103,8 +143,6 @@
           </div>
         </div>
         
-        
-        
         <div class="platform-selector">
           <h3 class="platform-title">Plataformas suportadas:</h3>
           <div class="platform-icons">
@@ -118,14 +156,24 @@
         </div>
       </div>
 
+      <!-- Anúncio Meio -->
+      <div class="ad-container ad-middle">
+        <script type="text/javascript">
+          atOptions = {
+            'key': 'f013eae7674151fbbb84d938311fe6c0',
+            'format': 'iframe',
+            'height': 250,
+            'width': 300,
+            'params': {}
+          };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/f013eae7674151fbbb84d938311fe6c0/invoke.js" async></script>
+      </div>
        
-       
-       <!-- Adicione esta seção -->
-<div id="searchResults" class="hidden">
-  <h3 class="search-results-title"><i class="fas fa-search"></i> Resultados da Busca</h3>
-  <div id="searchResultsGrid" class="search-results-grid"></div>
-</div>
-       
+      <div id="searchResults" class="hidden">
+        <h3 class="search-results-title"><i class="fas fa-search"></i> Resultados da Busca</h3>
+        <div id="searchResultsGrid" class="search-results-grid"></div>
+      </div>
        
       <div class="result-container hidden" id="resultContainer">
         <div class="media-info">
@@ -151,19 +199,28 @@
           </button>
         </div>
       </div>
-
-       
-       
-       
        
       <p id="status" class="status-message hidden" aria-live="polite"></p>
 
-         
       <div id="noticias" class="news-section fade-in">
         <h2><i class="fas fa-newspaper"></i> Notícias da sua região</h2>
         <div id="lista-noticias" class="news-grid"></div>
       </div>
-        </main>
+    </main>
+
+    <!-- Anúncio Antes do Footer -->
+    <div class="ad-container">
+      <script type="text/javascript">
+        atOptions = {
+          'key': 'cfe688e5fcfcf4c2d4e679f0241bdad6',
+          'format': 'iframe',
+          'height': 50,
+          'width': 320,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/cfe688e5fcfcf4c2d4e679f0241bdad6/invoke.js" async></script>
+    </div>
 
     <footer>
       <div class="footer-links">
@@ -184,29 +241,18 @@
 
   <!-- Scripts no final do body -->
   <script src="News.js"></script>
+  <script>
+    // Protege o escopo global
+    (function() {
+      // Seu código de inicialização pode vir aqui
+      document.addEventListener('DOMContentLoaded', function() {
+        // Garante que os scripts de anúncios não bloqueiem a execução
+        if(typeof atOptions !== 'undefined') {
+          console.log('Anúncios carregados com sucesso');
+        }
+      });
+    })();
+  </script>
   <script src="script.js"></script>
-  
-  <!-- Scripts de anúncios (opcional) -->
-  <script type="text/javascript">
-    atOptions = {
-      'key' : 'cfe688e5fcfcf4c2d4e679f0241bdad6',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/cfe688e5fcfcf4c2d4e679f0241bdad6/invoke.js" async></script>
-  
-  <script type="text/javascript">
-    atOptions = {
-      'key' : 'f013eae7674151fbbb84d938311fe6c0',
-      'format' : 'iframe',
-      'height' : 600,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/f013eae7674151fbbb84d938311fe6c0/invoke.js" async></script>
 </body>
 </html>
