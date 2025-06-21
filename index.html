@@ -24,8 +24,20 @@
       margin-top: 0;
     }
     
-    .ad-middle {
-      margin: 30px auto;
+    /* Seção de anúncios reservada */
+    .ads-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(0,0,0,0.02);
+      border-radius: 8px;
+      border: 1px dashed rgba(0,0,0,0.1);
+    }
+    
+    .ads-section h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #666;
+      font-size: 1.2rem;
     }
     
     @media (max-width: 768px) {
@@ -48,7 +60,7 @@
       </button>
     </header>
 
-    <!-- Anúncio Topo -->
+    <!-- Anúncio Topo (mantido) -->
     <div class="ad-container ad-top">
       <script type="text/javascript">
         atOptions = {
@@ -166,7 +178,7 @@
           <img id="thumb" class="hidden" alt="Miniatura do vídeo" loading="lazy">
           <div class="media-details">
             <h3 id="mediaTitle">Título do vídeo</h3>
-            <p id="mediaDuration">Duração: --:--</p>
+            <p id="mediaDuration">Dura��ão: --:--</p>
           </div>
         </div>
 
@@ -187,6 +199,12 @@
       </div>
        
       <p id="status" class="status-message hidden" aria-live="polite"></p>
+
+      <!-- Seção reservada para futuros anúncios -->
+      <section class="ads-section">
+        <h2><i class="fas fa-ad"></i> Espaço reservado para anúncios</h2>
+        <!-- Anúncios podem ser adicionados aqui no futuro -->
+      </section>
     </main>
 
     <footer>
@@ -220,17 +238,5 @@
     })();
   </script>
   <script src="script.js"></script>
-  
-  <!-- Novo anúncio adicionado no final -->
-  <script type="text/javascript">
-    atOptions = {
-      'key' : 'c51cce0b55f7faae4519b11e915eb248',
-      'format' : 'iframe',
-      'height' : 300,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/c51cce0b55f7faae4519b11e915eb248/invoke.js"></script>
 </body>
 </html>
