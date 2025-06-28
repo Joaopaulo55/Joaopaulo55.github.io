@@ -1,51 +1,52 @@
 <!doctype html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BDownload</title>
-  <meta name="description" content="Ferramenta para download de conteúdos educacionais públicos com licenças Creative Commons">
+  <title>BDownload - Baixar Vídeos do YouTube, Facebook e Instagram Gratis</title>
+  <meta name="description" content="Baixe vídeos do YouTube, Facebook, Instagram e mais em alta qualidade. Conversor online gratuito para MP3 e MP4. Ferramenta educacional para conteúdos Creative Commons.">
+  
+  <!-- Meta Tags SEO -->
+  <meta name="keywords" content="baixar vídeo YouTube, baixar música YouTube, como baixar vídeo YouTube, site para baixar vídeos, baixar reels Facebook, baixar vídeos Instagram, BDownload, y2mate, download vídeos">
+  <meta name="author" content="BDownload">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="BDownload - Baixar Vídeos do YouTube, Facebook e Instagram Gratis">
+  <meta property="og:description" content="Baixe vídeos do YouTube, Facebook, Instagram e mais em alta qualidade. Conversor online gratuito para MP3 e MP4.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bdownload.netlify.app">
+  <meta property="og:image" content="https://bdownload.netlify.app/thumbnail.jpg">
+  <meta property="og:site_name" content="BDownload">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BDownload - Baixar Vídeos do YouTube, Facebook e Instagram Gratis">
+  <meta name="twitter:description" content="Baixe vídeos do YouTube, Facebook, Instagram e mais em alta qualidade. Conversor online gratuito para MP3 e MP4.">
+  <meta name="twitter:image" content="https://bdownload.netlify.app/thumbnail.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Estilos para os anúncios */
-    .ad-container {
-      margin: 20px auto;
-      padding: 10px;
-      text-align: center;
-      background: rgba(0,0,0,0.03);
-      border-radius: 8px;
-      overflow: hidden;
-      max-width: 100%;
+  
+  <!-- Schema.org Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "BDownload",
+    "url": "https://bdownload.netlify.app",
+    "description": "Ferramenta para download de conteúdos educacionais públicos com licenças Creative Commons",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
     }
-    
-    .ad-top {
-      margin-top: 0;
-    }
-    
-    /* Seção de anúncios reservada */
-    .ads-section {
-      margin: 30px 0;
-      padding: 20px;
-      background: rgba(0,0,0,0.02);
-      border-radius: 8px;
-      border: 1px dashed rgba(0,0,0,0.1);
-    }
-    
-    .ads-section h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #666;
-      font-size: 1.2rem;
-    }
-    
-    @media (max-width: 768px) {
-      .ad-container {
-        padding: 5px;
-      }
-    }
-  </style>
+  }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -59,20 +60,6 @@
         <span class="theme-label">Modo Escuro</span>
       </button>
     </header>
-
-    <!-- Anúncio Topo (mantido) -->
-    <div class="ad-container ad-top">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'cfe688e5fcfcf4c2d4e679f0241bdad6',
-          'format': 'iframe',
-          'height': 50,
-          'width': 320,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/cfe688e5fcfcf4c2d4e679f0241bdad6/invoke.js" async></script>
-    </div>
 
     <main>
       <section class="tutorial-section">
@@ -178,7 +165,7 @@
           <img id="thumb" class="hidden" alt="Miniatura do vídeo" loading="lazy">
           <div class="media-details">
             <h3 id="mediaTitle">Título do vídeo</h3>
-            <p id="mediaDuration">Dura��ão: --:--</p>
+            <p id="mediaDuration">Duração: --:--</p>
           </div>
         </div>
 
@@ -199,14 +186,6 @@
       </div>
        
       <p id="status" class="status-message hidden" aria-live="polite"></p>
-
-     <!-- Seção reservada para futuros anúncios -->
-<section class="ads-section">
-  <h2><i class="fas fa-ad"></i> Espaço reservado para anúncios</h2>
-  <div class="ad-container">
-    <script type='text/javascript' src='//pl26978086.profitableratecpm.com/15/1a/45/151a4553ff8fbf13b995de13e8806b98.js'></script>
-  </div>
-</section>
     </main>
 
     <footer>
@@ -226,19 +205,6 @@
     <i class="fas fa-arrow-up"></i>
   </button>
 
-  <!-- Scripts no final do body -->
-  <script>
-    // Protege o escopo global
-    (function() {
-      // Seu código de inicialização pode vir aqui
-      document.addEventListener('DOMContentLoaded', function() {
-        // Garante que os scripts de anúncios não bloqueiem a execução
-        if(typeof atOptions !== 'undefined') {
-          console.log('Anúncios carregados com sucesso');
-        }
-      });
-    })();
-  </script>
   <script src="script.js"></script>
 </body>
 </html>
