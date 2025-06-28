@@ -1223,3 +1223,45 @@ footer {
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
 }
+
+/* Estilos para o status dos cookies */
+.cookie-status {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.cookie-status.valid {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.cookie-status.invalid {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.cookie-error-details {
+  font-size: 12px;
+  margin-top: 5px;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.cookie-check-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cookie-check-button:hover {
+  background-color: #5a6268;
+}

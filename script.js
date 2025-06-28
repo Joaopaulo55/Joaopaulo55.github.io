@@ -386,17 +386,19 @@ function updateVideoInfoUI(data) {
     duration.textContent = data.duration ? `Duração: ${formatDuration(data.duration)}` : 'Duração não disponível';
   }
   
-  if (cookieStatus) {
-    const hasCookies = data.cookies === 'válidos';
-    cookieStatus.innerHTML = `
-      <i class="fas ${hasCookies ? 'fa-check-circle text-green' : 'fa-exclamation-triangle text-yellow'}"></i> 
-      ${hasCookies ? 'Acesso premium disponível' : 'Acesso limitado (sem cookies)'}
+  if (data.cookieStatus) {
+    const cookieStatusElement = document.createElement('div');
+    cookieStatusElement.className = `cookie-status ${data.cookieStatus.validos ? 'valid' : 'invalid'}`;
+    cookieStatusElement.innerHTML = `
+      <i class="fas ${data.cookieStatus.validos ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+      ${data.cookieStatus.mensagem}
+      ${data.cookieStatus.erro ? `<div class="cookie-error-details">${data.cookieStatus.erro}</div>` : ''}
     `;
     
-    if (!hasCookies) {
-      showStatus('Para acessar formatos premium, atualize os cookies no servidor', 'warning');
+    const mediaDetails = document.querySelector('.media-details');
+    if (mediaDetails) {
+      mediaDetails.appendChild(cookieStatusElement);
     }
-    cookieStatus.classList.remove('hidden');
   }
   
   if (formats && data.formats && data.formats.length > 0) {
@@ -501,6 +503,36 @@ async function downloadVideo() {
   }
 }
 
+
+
+async function checkCookieStatus() {
+  try {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/cookie-status`);
+    const data = await response.json();
+    
+    if (data.validos) {
+      showStatus(data.mensagem, 'success');
+    } else {
+      showStatus(data.mensagem, 'warning');
+      if (data.erro) {
+        console.error('Erro nos cookies:', data.erro);
+      }
+    }
+    
+    return data;
+  } catch (error) {
+    showStatus('Erro ao verificar cookies', 'error');
+    console.error('Erro na verificação de cookies:', error);
+    return {
+      validos: false,
+      mensagem: 'Erro ao verificar cookies'
+    };
+  }
+}
+
+
+
+
 // ===========================
 // Inicialização
 // ===========================
@@ -524,6 +556,16 @@ function initPage() {
   initTutorialAccordion();
   initScrollToTop();
   initCopyButton();
+  checkCookieStatus();
+  
+  // verificar cookies manualmente
+  const cookieCheckBtn = document.createElement('button');
+  cookieCheckBtn.id = 'cookieCheckBtn';
+  cookieCheckBtn.className = 'cookie-check-button';
+  cookieCheckBtn.innerHTML = '<i class="fas fa-cookie"></i> Verificar Cookies';
+  cookieCheckBtn.onclick = checkCookieStatus;
+  document.querySelector('footer').prepend(cookieCheckBtn);
+  
 
   // Configura eventos
   const checkButton = el('check');
