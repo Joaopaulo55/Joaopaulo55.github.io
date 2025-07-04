@@ -192,25 +192,72 @@
           </div>
           
           <!-- Estrutura para a barra de progresso tecnológica -->
-          <div class="tech-progress-container hidden" id="progressContainer">
-            <div class="tech-progress-header">
-              <h4><i class="fas fa-rocket"></i> Preparando seu download...</h4>
-              <div class="tech-progress-stats">
-                <span class="tech-progress-speed"><i class="fas fa-tachometer-alt"></i> 0 MB/s</span>
-                <span class="tech-progress-time"><i class="fas fa-clock"></i> 00:00</span>
-              </div>
-            </div>
-            <div class="tech-progress-bar">
-              <div class="tech-progress-fill" id="progressBar"></div>
-              <div class="tech-progress-indicator" id="progressIndicator"></div>
-            </div>
-            <div class="tech-progress-details">
-              <span class="tech-progress-text" id="progressText">0%</span>
-              <span class="tech-progress-message">Iniciando conexão...</span>
-            </div>
+          <!-- Pop-up de Progresso -->
+<div class="progress-popup hidden" id="progressPopup">
+  <div class="popup-overlay"></div>
+  <div class="popup-content">
+    <button class="popup-close" id="closePopup" aria-label="Fechar pop-up">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="popup-header">
+      <h3><i class="fas fa-rocket"></i> Download em Progresso</h3>
+      <p>Seu conteúdo está sendo preparado...</p>
+    </div>
+    
+    <div class="popup-body">
+      <div class="tech-progress-container">
+        <div class="tech-progress-header">
+          <h4><i class="fas fa-tachometer-alt"></i> Estatísticas do Download</h4>
+          <div class="tech-progress-stats">
+            <span class="tech-progress-speed"><i class="fas fa-bolt"></i> 0 MB/s</span>
+            <span class="tech-progress-time"><i class="fas fa-clock"></i> 00:00</span>
+            <span class="tech-progress-size"><i class="fas fa-database"></i> 0 MB</span>
           </div>
         </div>
+        
+        <div class="tech-progress-bar">
+          <div class="tech-progress-fill" id="popupProgressBar"></div>
+          <div class="tech-progress-indicator" id="popupProgressIndicator"></div>
+        </div>
+        
+        <div class="tech-progress-details">
+          <span class="tech-progress-text" id="popupProgressText">0%</span>
+          <span class="tech-progress-message" id="popupProgressMessage">Iniciando conexão...</span>
+        </div>
       </div>
+      
+      <div class="progress-graph">
+        <canvas id="speedGraph" width="400" height="150"></canvas>
+      </div>
+    </div>
+    
+    <div class="popup-footer">
+      <div class="share-section">
+        <h4><i class="fas fa-share-alt"></i> Compartilhe com amigos</h4>
+        <p>Aproveite para compartilhar nosso site enquanto aguarda!</p>
+        
+        <div class="share-buttons">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://bdownload.netlify.app" target="_blank" class="share-button facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://twitter.com/intent/tweet?url=https://bdownload.netlify.app&text=Estou%20usando%20BDownload%20para%20baixar%20conteúdos%20educacionais!" target="_blank" class="share-button twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="https://api.whatsapp.com/send?text=Confira%20o%20BDownload,%20uma%20ferramenta%20incrível%20para%20baixar%20conteúdos%20educacionais:%20https://bdownload.netlify.app" target="_blank" class="share-button whatsapp">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://bdownload.netlify.app&title=BDownload&summary=Ferramenta%20para%20download%20de%20conteúdos%20educacionais" target="_blank" class="share-button linkedin">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+          <a href="mailto:?subject=Recomendação%20de%20site&body=Confira%20o%20BDownload:%20https://bdownload.netlify.app" class="share-button email">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
        
       <p id="status" class="status-message hidden" aria-live="polite"></p>
     </main>

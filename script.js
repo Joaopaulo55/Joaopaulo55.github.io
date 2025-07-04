@@ -17,6 +17,14 @@ let debounceTimer = null;
 let lastSearchQuery = '';
 let currentVideoTitle = '';
 
+// Elementos do popup de progresso
+const progressPopup = el('progressPopup');
+const closePopup = el('closePopup');
+const popupProgressBar = el('popupProgressBar');
+const popupProgressIndicator = el('popupProgressIndicator');
+const popupProgressText = el('popupProgressText');
+const popupProgressMessage = el('popupProgressMessage');
+
 function handleBrokenImage(img) {
   img.onerror = null;
   img.src = 'https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel';
@@ -80,6 +88,99 @@ function simulateProgress() {
 
 function sanitizeFilename(filename) {
   return filename.replace(/[^a-z0-9áéíóúñü \._-]/gi, '_').substring(0, 100);
+}
+
+// ===========================
+// Funções do Popup de Progresso
+// ===========================
+function initProgressPopup() {
+  if (closePopup) {
+    closePopup.addEventListener('click', () => {
+      if (progressPopup) progressPopup.classList.add('hidden');
+    });
+  }
+}
+
+function updatePopupProgress(percent, message) {
+  if (!popupProgressBar || !popupProgressIndicator || !popupProgressText || !popupProgressMessage) return;
+  
+  popupProgressBar.style.width = `${percent}%`;
+  popupProgressIndicator.style.left = `${percent}%`;
+  popupProgressText.textContent = `${Math.floor(percent)}%`;
+  popupProgressMessage.textContent = message;
+  
+  // Atualiza estatísticas simuladas
+  const speedElement = document.querySelector('.tech-progress-speed');
+  const timeElement = document.querySelector('.tech-progress-time');
+  const sizeElement = document.querySelector('.tech-progress-size');
+  
+  if (speedElement) {
+    speedElement.innerHTML = `<i class="fas fa-bolt"></i> ${(Math.random() * 5 + 1).toFixed(2)} MB/s`;
+  }
+  if (timeElement) {
+    timeElement.innerHTML = `<i class="fas fa-clock"></i> ${Math.floor(percent / 10)}:${Math.floor(percent % 10)}0`;
+  }
+  if (sizeElement) {
+    sizeElement.innerHTML = `<i class="fas fa-database"></i> ${(percent * 2.5).toFixed(1)} MB`;
+  }
+}
+
+function simulateDownloadProgress() {
+  let progress = 0;
+  const messages = [
+    "Conectando ao servidor...",
+    "Preparando download...",
+    "Transferindo dados...",
+    "Otimizando arquivo...",
+    "Quase lá...",
+    "Finalizando..."
+  ];
+  
+  const interval = setInterval(() => {
+    progress += Math.random() * 5;
+    if (progress > 100) progress = 100;
+    
+    updatePopupProgress(progress, messages[Math.floor(progress / 20)]);
+    
+    if (progress === 100) {
+      clearInterval(interval);
+      if (popupProgressMessage) {
+        popupProgressMessage.textContent = "Download completo!";
+      }
+      
+      updateSpeedGraph();
+    }
+  }, 500);
+}
+
+function updateSpeedGraph() {
+  const canvas = document.getElementById('speedGraph');
+  if (!canvas || !canvas.getContext) return;
+  
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  
+  // Limpa o canvas
+  ctx.clearRect(0, 0, width, height);
+  
+  // Desenha o gráfico
+  ctx.beginPath();
+  ctx.moveTo(0, height);
+  
+  for (let x = 0; x <= width; x += 20) {
+    const y = height - (Math.random() * 0.8 + 0.2) * height;
+    ctx.lineTo(x, y);
+  }
+  
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Adiciona rótulos
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-light');
+  ctx.font = '10px Arial';
+  ctx.fillText('Velocidade de Download', 10, 15);
 }
 
 // ===========================
@@ -385,6 +486,8 @@ async function downloadVideo() {
     return;
   }
 
+  // Mostra o popup de progresso
+  if (progressPopup) progressPopup.classList.remove('hidden');
   showStatus('Preparando download...', 'info');
   downloadButton.disabled = true;
   downloadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando';
@@ -406,7 +509,7 @@ async function downloadVideo() {
     window.open(data.download, '_blank');
     
     showStatus('Redirecionando para download...', 'success');
-    simulateProgress();
+    simulateDownloadProgress();
     
     setTimeout(() => {
       downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
@@ -417,6 +520,7 @@ async function downloadVideo() {
     console.error('Erro no download:', error);
     const progressBar = el('progressBar');
     if (progressBar) progressBar.style.width = '0%';
+    if (progressPopup) progressPopup.classList.add('hidden');
   } finally {
     downloadButton.disabled = false;
     downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
@@ -479,6 +583,7 @@ function initPage() {
   initScrollToTop();
   initAutoCheck();
   initCopyButton();
+  initProgressPopup();
   
   const checkButton = el('check');
   const downloadButton = el('download');
