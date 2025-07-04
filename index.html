@@ -131,6 +131,9 @@
         <div class="input-container">
           <div class="input-group">
             <input id="url" type="text" placeholder="Cole aqui o link de um conteúdo público (Creative Commons)..." aria-label="URL do conteúdo">  
+            <button id="copyUrl" class="copy-button" title="Copiar URL">
+              <i class="fas fa-copy"></i>
+            </button>
             <button id="check" class="primary-button">
               <i class="fas fa-search"></i>
               <span class="btn-text">Ver Qualidades</span>
@@ -173,15 +176,39 @@
           <h4><i class="fas fa-download"></i> Formatos disponíveis:</h4>
           <select id="formats" size="6" class="hidden" aria-label="Formatos disponíveis"></select>
           
-          <div class="progress-container hidden" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
-            <span class="progress-text" id="progressText">0%</span>
+          <div class="action-buttons">
+            <button id="download" class="secondary-button hidden">
+              <i class="fas fa-download"></i>
+              <span class="btn-text">Baixar Selecionado</span>
+            </button>
+            <button id="convertMp3" class="convert-button hidden">
+              <i class="fas fa-music"></i>
+              <span class="btn-text">Converter para MP3</span>
+            </button>
+            <button id="convertMp4" class="convert-button hidden">
+              <i class="fas fa-film"></i>
+              <span class="btn-text">Converter para MP4</span>
+            </button>
           </div>
           
-          <button id="download" class="secondary-button hidden">
-            <i class="fas fa-download"></i>
-            <span class="btn-text">Baixar Selecionado</span>
-          </button>
+          <!-- Estrutura para a barra de progresso tecnológica -->
+          <div class="tech-progress-container hidden" id="progressContainer">
+            <div class="tech-progress-header">
+              <h4><i class="fas fa-rocket"></i> Preparando seu download...</h4>
+              <div class="tech-progress-stats">
+                <span class="tech-progress-speed"><i class="fas fa-tachometer-alt"></i> 0 MB/s</span>
+                <span class="tech-progress-time"><i class="fas fa-clock"></i> 00:00</span>
+              </div>
+            </div>
+            <div class="tech-progress-bar">
+              <div class="tech-progress-fill" id="progressBar"></div>
+              <div class="tech-progress-indicator" id="progressIndicator"></div>
+            </div>
+            <div class="tech-progress-details">
+              <span class="tech-progress-text" id="progressText">0%</span>
+              <span class="tech-progress-message">Iniciando conexão...</span>
+            </div>
+          </div>
         </div>
       </div>
        

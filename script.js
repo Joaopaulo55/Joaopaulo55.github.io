@@ -2,14 +2,6 @@
 // Configurações Globais
 // ===========================
 const API_BASE_URL = 'https://backend-bdownload.onrender.com';
-const PLATFORM_URLS = {
-  'youtube': 'https://youtube.com/watch?v=',
-  'vimeo': 'https://vimeo.com/',
-  'facebook': 'https://facebook.com/watch/?v=',
-  'instagram': 'https://instagram.com/p/',
-  'tiktok': 'https://tiktok.com/@',
-  'all': 'https://'
-};
 const fetchWithTimeout = async (url, options = {}, timeout = 15000) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -21,7 +13,6 @@ const fetchWithTimeout = async (url, options = {}, timeout = 15000) => {
   return response;
 };
 
-let selectedPlatform = null;
 let debounceTimer = null;
 let lastSearchQuery = '';
 let currentVideoTitle = '';
@@ -43,12 +34,10 @@ function showStatus(message, type = 'info') {
   status.textContent = message;
   status.className = 'status-message';
   
-  // Remove todas as classes de tipo
   ['info', 'success', 'error', 'warning'].forEach(cls => {
     status.classList.remove(cls);
   });
   
-  // Adiciona a classe do tipo especificado
   if (type) status.classList.add(type);
 }
 
@@ -64,13 +53,6 @@ function formatDuration(seconds) {
     m > 9 ? m : (h > 0 ? '0' + m : m || '0'),
     s > 9 ? s : '0' + s
   ].filter(Boolean).join(':');
-}
-
-function formatDate(date) {
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
 }
 
 function simulateProgress() {
@@ -91,10 +73,9 @@ function simulateProgress() {
     progressText.textContent = `${Math.round(progress)}%`;
   }, 300);
 
-  // Timeout de segurança
   setTimeout(() => {
     clearInterval(progressInterval);
-  }, 10000); // 10 segundos
+  }, 10000);
 }
 
 function sanitizeFilename(filename) {
@@ -121,7 +102,6 @@ function initThemeToggle() {
     }
   };
 
-  // Verifica o tema salvo
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-theme');
     const icon = toggle.querySelector('i');
@@ -130,73 +110,46 @@ function initThemeToggle() {
 }
 
 function initTutorialAccordion() {
-    const tutorialHeader = document.getElementById('tutorialHeader');
-    const tutorialContent = document.getElementById('tutorialContent');
-    const tutorialToggle = tutorialHeader?.querySelector('.tutorial-toggle i');
-    
-    if (tutorialHeader && tutorialContent && tutorialToggle) {
-        tutorialHeader.addEventListener('click', function() {
-            tutorialContent.classList.toggle('show');
-            
-            if (tutorialContent.classList.contains('show')) {
-                tutorialToggle.classList.remove('fa-chevron-down');
-                tutorialToggle.classList.add('fa-chevron-up');
-                tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'none';
-            } else {
-                tutorialToggle.classList.remove('fa-chevron-up');
-                tutorialToggle.classList.add('fa-chevron-down');
-                tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'pulse 2s infinite';
-            }
-        });
-    }
+  const tutorialHeader = el('tutorialHeader');
+  const tutorialContent = el('tutorialContent');
+  const tutorialToggle = tutorialHeader?.querySelector('.tutorial-toggle i');
+  
+  if (tutorialHeader && tutorialContent && tutorialToggle) {
+    tutorialHeader.addEventListener('click', function() {
+      tutorialContent.classList.toggle('show');
+      
+      if (tutorialContent.classList.contains('show')) {
+        tutorialToggle.classList.remove('fa-chevron-down');
+        tutorialToggle.classList.add('fa-chevron-up');
+        tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'none';
+      } else {
+        tutorialToggle.classList.remove('fa-chevron-up');
+        tutorialToggle.classList.add('fa-chevron-down');
+        tutorialHeader.querySelector('.tutorial-toggle').style.animation = 'pulse 2s infinite';
+      }
+    });
+  }
 }
 
 function initScrollToTop() {
-    const scrollToTopBtn = document.getElementById('scrollToTop');
-    
-    if (scrollToTopBtn) {
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                scrollToTopBtn.classList.add('visible');
-            } else {
-                scrollToTopBtn.classList.remove('visible');
-            }
-        });
-        
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-}
-
-
-
-function initPlatformSelection() {
-  const platformIcons = document.querySelectorAll('.platform-icons i');
-  if (!platformIcons.length) return;
-
-  platformIcons.forEach(icon => {
-    icon.addEventListener('click', () => {
-      // Remove a classe 'selected' de todos os ícones
-      platformIcons.forEach(i => i.classList.remove('selected'));
-      
-      // Adiciona a classe 'selected' apenas ao ícone clicado
-      icon.classList.add('selected');
-      
-      // Define a plataforma selecionada
-      selectedPlatform = icon.dataset.platform;
-      
-      // Foca no input de URL
-      const urlInput = el('url');
-      if (urlInput) {
-        urlInput.focus();
-        urlInput.placeholder = `Pesquise vídeos no ${icon.title} ou cole um link...`;
+  const scrollToTopBtn = el('scrollToTop');
+  
+  if (scrollToTopBtn) {
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
       }
     });
-  });
+    
+    scrollToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
 }
 
 function initAutoCheck() {
@@ -206,7 +159,6 @@ function initAutoCheck() {
   urlInput.addEventListener('input', () => {
     const url = urlInput.value.trim();
     
-    // Se for um URL válido, verifica automaticamente após um pequeno atraso
     if (url.match(/^https?:\/\/.+\..+/)) {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -221,47 +173,44 @@ function initAutoCheck() {
       
       if (url.match(/^https?:\/\/.+\..+/)) {
         checkVideo();
-      } else if (selectedPlatform && url.length > 2) {
+      } else if (url.length > 2) {
         searchVideos(url);
       }
     }
   });
 }
 
-
 async function searchVideos(query) {
   if (!query || query.length < 3) return;
   if (query === lastSearchQuery) return;
   
   lastSearchQuery = query;
-  showStatus(`Pesquisando por "${query}" no ${selectedPlatform || 'todas as plataformas'}...`, 'info');
+  showStatus(`Pesquisando por "${query}"...`, 'info');
 
   try {
-    const platformParam = selectedPlatform === 'all' ? null : selectedPlatform;
     const response = await fetchWithTimeout(
-      `${API_BASE_URL}/buscar?q=${encodeURIComponent(query)}${platformParam ? `&platform=${platformParam}` : ''}`,
-      {}, // options
-      10000 // timeout de 10 segundos
+      `${API_BASE_URL}/search?q=${encodeURIComponent(query)}`,
+      {},
+      10000
     );
     
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.erro || 'Erro ao buscar vídeos');
+      throw new Error(errorData.error || 'Erro ao buscar vídeos');
     }
     
     const data = await response.json();
     
-    if (!data.resultados || data.resultados.length === 0) {
+    if (!data || data.length === 0) {
       throw new Error('Nenhum resultado encontrado');
     }
     
-    displaySearchResults(data.resultados);
+    displaySearchResults(data);
     
   } catch (error) {
     showStatus(error.message || 'Erro ao buscar vídeos', 'error');
     console.error('Erro na busca:', error);
     
-    // Limpa resultados em caso de erro
     const resultsGrid = el('searchResultsGrid');
     if (resultsGrid) resultsGrid.innerHTML = '';
     
@@ -284,17 +233,14 @@ function displaySearchResults(results) {
 
   resultsGrid.innerHTML = results.map(result => `
     <div class="search-result-item" data-url="${result.url}">
-      <img src="${result.thumb}" alt="${result.titulo}" class="search-result-thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel'">
+      <img src="${result.thumbnail}" alt="${result.title}" class="search-result-thumbnail" loading="lazy" onerror="handleBrokenImage(this)">
       <div class="search-result-info">
-        <div class="search-result-title">${result.titulo}</div>
-        <div class="search-result-channel">${result.canal || 'Canal desconhecido'}</div>
-        <div class="search-result-platform">${result.plataforma}</div>
-        <div class="search-result-duration">${result.duracao || '--:--'}</div>
+        <div class="search-result-title">${result.title || 'Sem título'}</div>
+        <div class="search-result-duration">${result.duration ? formatDuration(result.duration) : '--:--'}</div>
       </div>
     </div>
   `).join('');
 
-  // Adiciona event listeners para os resultados
   document.querySelectorAll('.search-result-item').forEach(item => {
     item.addEventListener('click', () => {
       const url = item.dataset.url;
@@ -306,11 +252,6 @@ function displaySearchResults(results) {
   resultsContainer.classList.remove('hidden');
   showStatus(`${results.length} resultados encontrados`, 'success');
 }
-
-
-
-
-
 
 // ===========================
 // Lógica Principal
@@ -332,7 +273,7 @@ async function checkVideo() {
   checkButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando';
 
   try {
-    const res = await fetchWithTimeout(`${API_BASE_URL}/formats`, {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/info`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -344,7 +285,6 @@ async function checkVideo() {
       throw new Error(data.error || 'Erro ao consultar o vídeo');
     }
     
-    // Atualiza a UI com os dados recebidos
     updateVideoInfoUI(data);
     
   } catch (error) {
@@ -360,7 +300,6 @@ function updateVideoInfoUI(data) {
   const thumb = el('thumb');
   const title = el('mediaTitle');
   const duration = el('mediaDuration');
-  const cookieStatus = el('cookieStatus');
   const formats = el('formats');
   const downloadButton = el('download');
   const resultContainer = el('resultContainer');
@@ -386,41 +325,18 @@ function updateVideoInfoUI(data) {
     duration.textContent = data.duration ? `Duração: ${formatDuration(data.duration)}` : 'Duração não disponível';
   }
   
-  if (data.cookieStatus) {
-    const cookieStatusElement = document.createElement('div');
-    cookieStatusElement.className = `cookie-status ${data.cookieStatus.validos ? 'valid' : 'invalid'}`;
-    cookieStatusElement.innerHTML = `
-      <i class="fas ${data.cookieStatus.validos ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
-      ${data.cookieStatus.mensagem}
-      ${data.cookieStatus.erro ? `<div class="cookie-error-details">${data.cookieStatus.erro}</div>` : ''}
-    `;
-    
-    const mediaDetails = document.querySelector('.media-details');
-    if (mediaDetails) {
-      mediaDetails.appendChild(cookieStatusElement);
-    }
-  }
-  
   if (formats && data.formats && data.formats.length > 0) {
-    // Ordenar formatos
     const sortedFormats = data.formats.sort((a, b) => {
-      const aScore = (a.vcodec !== 'none' ? 2 : 0) + (a.acodec !== 'none' ? 1 : 0);
-      const bScore = (b.vcodec !== 'none' ? 2 : 0) + (b.acodec !== 'none' ? 1 : 0);
+      const aScore = (a.height || 0) + (a.filesize || 0);
+      const bScore = (b.height || 0) + (b.filesize || 0);
       return bScore - aScore;
     });
     
     formats.innerHTML = sortedFormats.map(f => {
-      const isVideo = f.vcodec !== 'none';
-      const isAudio = f.acodec !== 'none';
-      let type = '';
-      
-      if (isVideo && isAudio) type = 'Vídeo + Áudio';
-      else if (isVideo) type = 'Apenas Vídeo';
-      else if (isAudio) type = 'Apenas Áudio';
-      
-      return `<option value="${f.id}">
-        ${f.resolution?.padEnd(6) || 'Áudio'} | ${f.ext.toUpperCase()} | ${type}
-        ${f.filesize ? `| ${formatFileSize(f.filesize)}` : ''}
+      const resolution = f.height ? `${f.height}p` : 'Áudio';
+      const size = f.filesize ? `| ${formatFileSize(f.filesize)}` : '';
+      return `<option value="${f.format}">
+        ${resolution} | ${f.ext.toUpperCase()} ${size}
       </option>`;
     }).join('');
     
@@ -432,10 +348,6 @@ function updateVideoInfoUI(data) {
   if (resultContainer) resultContainer.classList.remove('hidden');
 }
 
-
-// ===========================
-// Função Auxiliar
-// ===========================
 function formatFileSize(bytes) {
   if (!bytes) return '';
   if (bytes < 1024) return bytes + ' B';
@@ -457,9 +369,6 @@ function initCopyButton() {
   }
 }
 
-// ===========================
-// Lógica Principal (continuação)
-// ===========================
 async function downloadVideo() {
   const urlInput = el('url');
   const formats = el('formats');
@@ -469,9 +378,9 @@ async function downloadVideo() {
   if (!urlInput || !formats || !downloadButton) return;
 
   const url = urlInput.value.trim();
-  const fmtId = formats.value;
+  const format = formats.value;
   
-  if (!fmtId) {
+  if (!format) {
     showStatus('Selecione um formato para baixar', 'error');
     return;
   }
@@ -482,8 +391,19 @@ async function downloadVideo() {
   if (progressContainer) progressContainer.classList.remove('hidden');
 
   try {
-    const redirectUrl = `${API_BASE_URL}/redirect-download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(fmtId)}`;
-    window.open(redirectUrl, '_blank');
+    const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, format })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao preparar download');
+    }
+    
+    const data = await response.json();
+    window.open(data.download, '_blank');
     
     showStatus('Redirecionando para download...', 'success');
     simulateProgress();
@@ -503,79 +423,74 @@ async function downloadVideo() {
   }
 }
 
+async function convertVideo(format) {
+  const urlInput = el('url');
+  if (!urlInput) return;
 
+  const url = urlInput.value.trim();
+  if (!url) {
+    showStatus('Por favor, insira um URL válido', 'error');
+    return;
+  }
 
-async function checkCookieStatus() {
+  showStatus(`Convertendo para ${format.toUpperCase()}...`, 'info');
+
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/cookie-status`);
-    const data = await response.json();
+    const response = await fetchWithTimeout(`${API_BASE_URL}/convert`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, format })
+    });
     
-    if (data.validos) {
-      showStatus(data.mensagem, 'success');
-    } else {
-      showStatus(data.mensagem, 'warning');
-      if (data.erro) {
-        console.error('Erro nos cookies:', data.erro);
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro na conversão');
     }
     
-    return data;
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = `${sanitizeFilename(currentVideoTitle)}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+    
+    showStatus('Conversão concluída!', 'success');
+    
   } catch (error) {
-    showStatus('Erro ao verificar cookies', 'error');
-    console.error('Erro na verificação de cookies:', error);
-    return {
-      validos: false,
-      mensagem: 'Erro ao verificar cookies'
-    };
+    showStatus(error.message || 'Erro na conversão', 'error');
+    console.error('Erro na conversão:', error);
   }
 }
-
-
-
 
 // ===========================
 // Inicialização
 // ===========================
 function initPage() {
-  // Atualiza o ano no footer
   const currentYear = el('currentYear');
   if (currentYear) {
     currentYear.textContent = new Date().getFullYear();
   }
 
-  // Atualiza a data atual (para termos e privacidade)
-  const currentDate = el('currentDate');
-  if (currentDate) {
-    currentDate.textContent = formatDate(new Date());
-  }
-
-  // Inicializa componentes
   initThemeToggle();
-  initPlatformSelection();
-  initAutoCheck();
   initTutorialAccordion();
   initScrollToTop();
+  initAutoCheck();
   initCopyButton();
-  checkCookieStatus();
   
-  // verificar cookies manualmente
-  const cookieCheckBtn = document.createElement('button');
-  cookieCheckBtn.id = 'cookieCheckBtn';
-  cookieCheckBtn.className = 'cookie-check-button';
-  cookieCheckBtn.innerHTML = '<i class="fas fa-cookie"></i> Verificar Cookies';
-  cookieCheckBtn.onclick = checkCookieStatus;
-  document.querySelector('footer').prepend(cookieCheckBtn);
-  
-
-  // Configura eventos
   const checkButton = el('check');
   const downloadButton = el('download');
+  const mp3Button = el('convertMp3');
+  const mp4Button = el('convertMp4');
   
   if (checkButton) checkButton.onclick = checkVideo;
   if (downloadButton) downloadButton.onclick = downloadVideo;
+  if (mp3Button) mp3Button.onclick = () => convertVideo('mp3');
+  if (mp4Button) mp4Button.onclick = () => convertVideo('mp4');
 }
 
-// Inicia a aplicação quando o DOM estiver pronto
 if (document.readyState !== 'loading') {
   initPage();
 } else {
