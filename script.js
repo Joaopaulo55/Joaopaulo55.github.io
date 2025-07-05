@@ -144,13 +144,40 @@ function updatePopupProgress(percent, message) {
   }
 }
 
+function showProgressPopup() {
+  if (progressPopup) {
+    progressPopup.classList.remove('hidden');
+    updatePopupProgress(0, 'Preparando download...');
+  }
+}
+
+function hideProgressPopup() {
+  if (progressPopup) {
+    setTimeout(() => {
+      progressPopup.classList.add('hidden');
+    }, 2000);
+  }
+}
+
+function simulateProgress(callback) {
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 10;
+    updatePopupProgress(progress, progress < 100 ? 'Baixando...' : 'Finalizando...');
+    
+    if (progress >= 100) {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 400);
+}
+
 function initEventSources() {
   // Conecta ao SSE de notificações
   eventSource = new EventSource(`${API_BASE_URL}/notifications`);
   
   eventSource.onmessage = (e) => {
     try {
-      // Verifica se os dados estão no formato correto
       const jsonStr = e.data.startsWith('data: ') ? e.data.substring(6).trim() : e.data;
       const data = JSON.parse(jsonStr);
       showNewsPopup(data.number);
@@ -208,35 +235,6 @@ function closeNewsPopupHandler() {
   if (newsPopup) newsPopup.classList.add('hidden');
 }
 
-function initProgressTracking() {
-  if (progressSource) progressSource.close();
-  
-  progressSource = new EventSource(`${API_BASE_URL}/download`);
-  
-  progressSource.addEventListener('progress', (e) => {
-    try {
-      const jsonStr = e.data.startsWith('data: ') ? e.data.substring(6).trim() : e.data;
-      const data = JSON.parse(jsonStr);
-      updateProgressBar(data.progress);
-      
-      if (data.download) {
-        handleDownload(data.download);
-      }
-      
-      if (data.message) {
-        updatePopupProgress(data.progress, data.message);
-      }
-    } catch (error) {
-      console.error('Erro ao processar evento:', error);
-    }
-  });
-  
-  progressSource.onerror = (e) => {
-    console.error('Erro na conexão de progresso:', e);
-    setTimeout(initProgressTracking, 5000);
-  };
-}
-
 function updateProgressBar(progress) {
   const progressBar = el('progressBar');
   const progressText = el('progressText');
@@ -257,11 +255,7 @@ function handleDownload(downloadUrl) {
   }
   
   showStatus('Download concluído!', 'success');
-  
-  // Fecha o popup de progresso após 2 segundos
-  setTimeout(() => {
-    if (progressPopup) progressPopup.classList.add('hidden');
-  }, 2000);
+  hideProgressPopup();
 }
 
 // ===========================
@@ -570,39 +564,42 @@ async function downloadVideo() {
   }
 
   // Mostra o popup de progresso
-  if (progressPopup) progressPopup.classList.remove('hidden');
+  showProgressPopup();
   showStatus('Preparando download...', 'info');
   downloadButton.disabled = true;
   downloadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando';
 
-  // Inicia o acompanhamento de progresso
-  initProgressTracking();
-  
-  try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, format })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Erro ao preparar download');
+  // Inicia a simulação de progresso
+  simulateProgress(async () => {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }) // Envia apenas a URL
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao preparar download');
+      }
+      
+      const data = await response.json();
+      
+      if (data.downloadUrl) {
+        handleDownload(data.downloadUrl);
+      } else {
+        throw new Error('URL de download não recebida');
+      }
+      
+    } catch (error) {
+      showStatus(error.message || 'Erro durante o download', 'error');
+      console.error('Erro no download:', error);
+      updatePopupProgress(0, 'Erro no download');
+      downloadButton.disabled = false;
+      downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
+      hideProgressPopup();
     }
-    
-    const data = await response.json();
-    
-    // O progresso será atualizado via SSE
-    // O download será aberto automaticamente quando o progresso chegar a 100%
-    
-  } catch (error) {
-    showStatus(error.message || 'Erro durante o download', 'error');
-    console.error('Erro no download:', error);
-    updateProgressBar(0);
-    if (progressPopup) progressPopup.classList.add('hidden');
-    downloadButton.disabled = false;
-    downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
-  }
+  });
 }
 
 async function convertVideo(format) {
@@ -684,7 +681,6 @@ function initPage() {
 // Fecha as conexões SSE quando a página é descarregada
 window.addEventListener('beforeunload', () => {
   if (eventSource) eventSource.close();
-  if (progressSource) progressSource.close();
 });
 
 if (document.readyState !== 'loading') {
