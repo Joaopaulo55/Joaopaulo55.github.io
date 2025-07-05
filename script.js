@@ -564,42 +564,57 @@ async function downloadVideo() {
   }
 
   // Mostra o popup de progresso
-  showProgressPopup();
+  if (progressPopup) progressPopup.classList.remove('hidden');
   showStatus('Preparando download...', 'info');
   downloadButton.disabled = true;
   downloadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando';
 
-  // Inicia a simulação de progresso
-  simulateProgress(async () => {
-    try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, format }) // Envia tanto URL quanto formato
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao preparar download');
-      }
-      
-      const data = await response.json();
-      
-      if (data.downloadUrl) {
-        handleDownload(data.downloadUrl);
-      } else {
-        throw new Error('URL de download não recebida');
-      }
-      
-    } catch (error) {
-      showStatus(error.message || 'Erro durante o download', 'error');
-      console.error('Erro no download:', error);
-      updatePopupProgress(0, 'Erro no download');
-      downloadButton.disabled = false;
-      downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
-      hideProgressPopup();
+  try {
+    // Simula progresso enquanto faz a requisição
+    simulateDownloadProgress();
+    
+    const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        url: url,
+        format: format // Garante que o formato está sendo enviado
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao preparar download');
     }
-  });
+    
+    const data = await response.json();
+    
+    if (!data.download) {
+      throw new Error('URL de download não recebida do servidor');
+    }
+    
+    // Abre o download em uma nova aba
+    window.open(data.download, '_blank');
+    
+    // Atualiza a UI
+    downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
+    showStatus('Download concluído!', 'success');
+    
+    // Fecha o popup após 2 segundos
+    setTimeout(() => {
+      if (progressPopup) progressPopup.classList.add('hidden');
+    }, 2000);
+    
+  } catch (error) {
+    showStatus(error.message || 'Erro durante o download', 'error');
+    console.error('Erro no download:', error);
+    
+    // Reseta a UI em caso de erro
+    if (progressPopup) progressPopup.classList.add('hidden');
+    downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
+  } finally {
+    downloadButton.disabled = false;
+  }
 }
 
 async function convertVideo(format) {
