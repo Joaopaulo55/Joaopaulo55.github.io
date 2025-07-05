@@ -18,12 +18,12 @@ let lastSearchQuery = '';
 let currentVideoTitle = '';
 
 // Elementos do popup de progresso
-const progressPopup = el('progressPopup');
-const closePopup = el('closePopup');
-const popupProgressBar = el('popupProgressBar');
-const popupProgressIndicator = el('popupProgressIndicator');
-const popupProgressText = el('popupProgressText');
-const popupProgressMessage = el('popupProgressMessage');
+const progressPopup = document.getElementById('progressPopup');
+const closePopup = document.getElementById('closePopup');
+const popupProgressBar = document.getElementById('popupProgressBar');
+const popupProgressIndicator = document.getElementById('popupProgressIndicator');
+const popupProgressText = document.getElementById('popupProgressText');
+const popupProgressMessage = document.getElementById('popupProgressMessage');
 
 function handleBrokenImage(img) {
   img.onerror = null;

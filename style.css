@@ -1391,6 +1391,8 @@ footer {
     }
 }
 
+
+
 /* Pop-up de Progresso */
 .progress-popup {
   position: fixed;
@@ -1581,4 +1583,62 @@ footer {
     gap: 0.5rem;
     align-items: flex-start;
   }
+}
+
+
+/* Adicione ao seu style.css */
+
+/* Estilo para o container do gráfico */
+.progress-graph-container {
+  position: relative;
+  margin-top: 2rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+}
+
+.dark-theme .progress-graph-container {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.graph-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Estilo para informações do download */
+.download-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background-color: rgba(66, 133, 244, 0.1);
+  border-left: 3px solid var(--primary-color);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Estilo para os botões de ação */
+.popup-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+/* Efeito para quando o download estiver pausado */
+.download-paused .tech-progress-fill,
+.download-paused .tech-progress-indicator {
+  opacity: 0.5;
 }

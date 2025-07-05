@@ -214,74 +214,97 @@
   </button>
 
       
-        <!-- Estrutura para a barra de progresso tecnológica -->
-          <!-- Pop-up de Progresso -->
-<div class="progress-popup hidden" id="progressPopup">
-  <div class="popup-overlay"></div>
-  <div class="popup-content">
-    <button class="popup-close" id="closePopup" aria-label="Fechar pop-up">
-      <i class="fas fa-times"></i>
-    </button>
-    
-    <div class="popup-header">
-      <h3><i class="fas fa-rocket"></i> Download em Progresso</h3>
-      <p>Seu conteúdo está sendo preparado...</p>
-    </div>
-    
-    <div class="popup-body">
-      <div class="tech-progress-container">
-        <div class="tech-progress-header">
-          <h4><i class="fas fa-tachometer-alt"></i> Estatísticas do Download</h4>
-          <div class="tech-progress-stats">
-            <span class="tech-progress-speed"><i class="fas fa-bolt"></i> 0 MB/s</span>
-            <span class="tech-progress-time"><i class="fas fa-clock"></i> 00:00</span>
-            <span class="tech-progress-size"><i class="fas fa-database"></i> 0 MB</span>
+         <!-- Pop-up de Progresso (versão otimizada) -->
+  <div class="progress-popup hidden" id="progressPopup">
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup-content">
+      <button class="popup-close" id="closePopup" aria-label="Fechar pop-up">
+        <i class="fas fa-times"></i>
+      </button>
+      
+      <div class="popup-header">
+        <h3><i class="fas fa-rocket"></i> Download em Progresso</h3>
+        <p id="popupStatusMessage">Seu conteúdo está sendo preparado...</p>
+      </div>
+      
+      <div class="popup-body">
+        <div class="tech-progress-container">
+          <div class="tech-progress-header">
+            <h4><i class="fas fa-tachometer-alt"></i> Estatísticas do Download</h4>
+            <div class="tech-progress-stats">
+              <span class="tech-progress-speed"><i class="fas fa-bolt"></i> <span id="downloadSpeed">0</span> MB/s</span>
+              <span class="tech-progress-time"><i class="fas fa-clock"></i> <span id="downloadTime">00:00</span></span>
+              <span class="tech-progress-size"><i class="fas fa-database"></i> <span id="downloadSize">0</span> MB</span>
+            </div>
+          </div>
+          
+          <div class="tech-progress-bar">
+            <div class="tech-progress-fill" id="popupProgressBar"></div>
+            <div class="tech-progress-indicator" id="popupProgressIndicator"></div>
+          </div>
+          
+          <div class="tech-progress-details">
+            <span class="tech-progress-text" id="popupProgressText">0%</span>
+            <span class="tech-progress-message" id="popupProgressMessage">Iniciando conexão...</span>
           </div>
         </div>
         
-        <div class="tech-progress-bar">
-          <div class="tech-progress-fill" id="popupProgressBar"></div>
-          <div class="tech-progress-indicator" id="popupProgressIndicator"></div>
+        <div class="progress-graph-container">
+          <canvas id="speedGraph" width="400" height="150"></canvas>
+          <div class="graph-labels">
+            <span>Tempo</span>
+            <span>Velocidade (MB/s)</span>
+          </div>
         </div>
-        
-        <div class="tech-progress-details">
-          <span class="tech-progress-text" id="popupProgressText">0%</span>
-          <span class="tech-progress-message" id="popupProgressMessage">Iniciando conexão...</span>
+
+        <div class="download-info hidden" id="downloadInfo">
+          <div class="info-item">
+            <i class="fas fa-file-alt"></i>
+            <span id="fileName">Arquivo: carregando...</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-server"></i>
+            <span id="serverLocation">Servidor: otimizado para sua região</span>
+          </div>
         </div>
       </div>
       
-      <div class="progress-graph">
-        <canvas id="speedGraph" width="400" height="150"></canvas>
-      </div>
-    </div>
-    
-    <div class="popup-footer">
-      <div class="share-section">
-        <h4><i class="fas fa-share-alt"></i> Compartilhe com amigos</h4>
-        <p>Aproveite para compartilhar nosso site enquanto aguarda!</p>
-        
-        <div class="share-buttons">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://bdownload.netlify.app" target="_blank" class="share-button facebook">
-            <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="https://twitter.com/intent/tweet?url=https://bdownload.netlify.app&text=Estou%20usando%20BDownload%20para%20baixar%20conteúdos%20educacionais!" target="_blank" class="share-button twitter">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="https://api.whatsapp.com/send?text=Confira%20o%20BDownload,%20uma%20ferramenta%20incrível%20para%20baixar%20conteúdos%20educacionais:%20https://bdownload.netlify.app" target="_blank" class="share-button whatsapp">
-            <i class="fab fa-whatsapp"></i>
-          </a>
-          <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://bdownload.netlify.app&title=BDownload&summary=Ferramenta%20para%20download%20de%20conteúdos%20educacionais" target="_blank" class="share-button linkedin">
-            <i class="fab fa-linkedin-in"></i>
-          </a>
-          <a href="mailto:?subject=Recomendação%20de%20site&body=Confira%20o%20BDownload:%20https://bdownload.netlify.app" class="share-button email">
-            <i class="fas fa-envelope"></i>
-          </a>
+      <div class="popup-footer">
+        <div class="share-section">
+          <h4><i class="fas fa-share-alt"></i> Compartilhe com amigos</h4>
+          <p>Aproveite para compartilhar nosso site enquanto aguarda!</p>
+          
+          <div class="share-buttons">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://bdownload.netlify.app" target="_blank" class="share-button facebook" aria-label="Compartilhar no Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://twitter.com/intent/tweet?url=https://bdownload.netlify.app&text=Estou%20usando%20BDownload%20para%20baixar%20conteúdos%20educacionais!" target="_blank" class="share-button twitter" aria-label="Compartilhar no Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://api.whatsapp.com/send?text=Confira%20o%20BDownload,%20uma%20ferramenta%20incrível%20para%20baixar%20conteúdos%20educacionais:%20https://bdownload.netlify.app" target="_blank" class="share-button whatsapp" aria-label="Compartilhar no WhatsApp">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://bdownload.netlify.app&title=BDownload&summary=Ferramenta%20para%20download%20de%20conteúdos%20educacionais" target="_blank" class="share-button linkedin" aria-label="Compartilhar no LinkedIn">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="mailto:?subject=Recomendação%20de%20site&body=Confira%20o%20BDownload:%20https://bdownload.netlify.app" class="share-button email" aria-label="Compartilhar por Email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="popup-actions">
+          <button class="secondary-button" id="pauseResumeBtn">
+            <i class="fas fa-pause"></i> Pausar
+          </button>
+          <button class="secondary-button" id="closeBottomPopup">
+            <i class="fas fa-times"></i> Fechar
+          </button>
         </div>
       </div>
     </div>
   </div>
-</div>
-      
+
       
       
       
