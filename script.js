@@ -167,7 +167,7 @@ function closeNewsPopupHandler() {
 function initProgressTracking() {
   if (progressSource) progressSource.close();
   
-  progressSource = new EventSource(`${API_BASE_URL}/download/progress`);
+  progressSource = new EventSource(`${API_BASE_URL}/download`);
   
   progressSource.addEventListener('progress', (e) => {
     try {
@@ -185,6 +185,9 @@ function initProgressTracking() {
       console.error('Erro ao processar evento:', error);
     }
   });
+  
+  
+  
   
   progressSource.onerror = (e) => {
     console.error('Erro na conexão de progresso:', e);
