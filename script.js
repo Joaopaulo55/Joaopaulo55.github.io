@@ -33,6 +33,40 @@ const newsPopupContent = document.getElementById('newsPopupContent');
 const closeNewsPopup = document.getElementById('closeNewsPopup');
 const adsContainer = document.getElementById('adsContainer');
 
+// Dados de notícias e anúncios (serão preenchidos pelos arquivos externos)
+let newsData = [];
+let adsData = [];
+
+// Carrega dados externos se disponíveis
+try {
+  if (typeof window.newsData !== 'undefined') {
+    newsData = window.newsData;
+  } else {
+    console.warn('News.js não carregado - usando dados padrão');
+    newsData = [{
+      title: "Notícia Padrão",
+      content: "O sistema está funcionando normalmente.",
+      category: "Geral",
+      source: "Sistema",
+      date: new Date().toISOString()
+    }];
+  }
+
+  if (typeof window.adsData !== 'undefined') {
+    adsData = window.adsData;
+  } else {
+    console.warn('ads.js não carregado - usando dados padrão');
+    adsData = [{
+      title: "Anúncio Padrão",
+      text: "Experimente nossos serviços premium!",
+      image: "https://via.placeholder.com/300x100?text=Anuncio+Padrao",
+      link: "#"
+    }];
+  }
+} catch (error) {
+  console.error('Erro ao carregar dados externos:', error);
+}
+
 function handleBrokenImage(img) {
   img.onerror = null;
   img.src = 'https://via.placeholder.com/300x200?text=Thumbnail+indispon%C3%ADvel';
@@ -115,13 +149,18 @@ function initEventSources() {
   eventSource = new EventSource(`${API_BASE_URL}/notifications`);
   
   eventSource.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    showNewsPopup(data.number);
+    try {
+      // Verifica se os dados estão no formato correto
+      const jsonStr = e.data.startsWith('data: ') ? e.data.substring(6).trim() : e.data;
+      const data = JSON.parse(jsonStr);
+      showNewsPopup(data.number);
+    } catch (error) {
+      console.error('Erro ao processar notificação:', error);
+    }
   };
   
   eventSource.onerror = (e) => {
     console.error('Erro na conexão de notificações:', e);
-    // Tentar reconectar após 5 segundos
     setTimeout(initEventSources, 5000);
   };
 }
@@ -129,33 +168,38 @@ function initEventSources() {
 function showNewsPopup(randomNumber) {
   if (!newsPopup || !newsPopupContent || !adsContainer) return;
   
-  // Simula notícias e anúncios baseados no número aleatório
-  const news = {
-    title: `Notícia Importante #${randomNumber}`,
-    content: `Esta é uma notícia simulada com o número ${randomNumber}. O sistema está funcionando corretamente.`,
-    source: "Fonte: Sistema de Notícias"
-  };
-  
-  const ads = {
-    content: `<a href="#" target="_blank" class="ad-link">
-      <img src="https://via.placeholder.com/300x100?text=Anuncio+${randomNumber}" alt="Anúncio">
-    </a>`
-  };
-  
-  newsPopupContent.innerHTML = `
-    <h3>Notícias da Região</h3>
-    <div class="news-item">
-      <h4>${news.title}</h4>
-      <p>${news.content}</p>
-      <small>${news.source}</small>
-    </div>
-  `;
-  
-  adsContainer.innerHTML = `
-    <div class="ad-banner">
-      ${ads.content}
-    </div>
-  `;
+  // 0-10: Anúncios, 11-20: Notícias
+  if (randomNumber <= 10) {
+    // Mostrar anúncio
+    const adIndex = randomNumber % adsData.length;
+    const ad = adsData[adIndex];
+    
+    adsContainer.innerHTML = `
+      <div class="ad-banner">
+        <a href="${ad.link}" target="_blank" class="ad-link">
+          <img src="${ad.image}" alt="${ad.title}" onerror="handleBrokenImage(this)">
+          <div class="ad-text">${ad.text}</div>
+        </a>
+      </div>
+    `;
+    
+    newsPopupContent.innerHTML = '';
+  } else {
+    // Mostrar notícia
+    const newsIndex = (randomNumber - 11) % newsData.length;
+    const newsItem = newsData[newsIndex];
+    
+    newsPopupContent.innerHTML = `
+      <h3>${newsItem.category}</h3>
+      <div class="news-item">
+        <h4>${newsItem.title}</h4>
+        <p>${newsItem.content}</p>
+        <small>${newsItem.source} - ${new Date(newsItem.date).toLocaleDateString()}</small>
+      </div>
+    `;
+    
+    adsContainer.innerHTML = '';
+  }
   
   newsPopup.classList.remove('hidden');
 }
@@ -171,7 +215,8 @@ function initProgressTracking() {
   
   progressSource.addEventListener('progress', (e) => {
     try {
-      const data = JSON.parse(e.data);
+      const jsonStr = e.data.startsWith('data: ') ? e.data.substring(6).trim() : e.data;
+      const data = JSON.parse(jsonStr);
       updateProgressBar(data.progress);
       
       if (data.download) {
@@ -185,9 +230,6 @@ function initProgressTracking() {
       console.error('Erro ao processar evento:', error);
     }
   });
-  
-  
-  
   
   progressSource.onerror = (e) => {
     console.error('Erro na conexão de progresso:', e);

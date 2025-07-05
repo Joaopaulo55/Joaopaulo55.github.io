@@ -1,17 +1,12 @@
+// News.js - Versão atualizada para integração com script.js
 const API_KEY = 'pub_78c798a7fdd24d4ea4910fc1a264f469';
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const listaNoticias = document.getElementById('lista-noticias');
-  
-  try {
-    // Mostrar estado de carregamento
-    listaNoticias.innerHTML = `
-      <div class="col-span-full flex justify-center items-center py-8">
-        <i class="fas fa-spinner fa-spin text-primary-color text-2xl mr-2"></i>
-        <span class="text-text-color">Carregando notícias...</span>
-      </div>
-    `;
+// Armazena as notícias carregadas para uso nos pop-ups
+window.newsData = [];
 
+// Carrega as notícias quando o script é importado
+(async function loadNews() {
+  try {
     // Obter localização com fallback
     let local;
     try {
@@ -22,40 +17,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       local = { country_code: 'br' }; // Fallback para Brasil
     }
 
-    // Obter notícias
+    // Obter notícias da API
     const country = local.country_code.toLowerCase();
     const noticias = await getNoticias(country);
     
-    // Exibir notícias ou mensagem se vazio
     if (noticias && noticias.length > 0) {
-      mostrarNoticias(noticias);
+      // Formata as notícias para o formato esperado pelo script.js
+      window.newsData = noticias.map(noticia => ({
+        title: noticia.title || 'Sem título',
+        content: noticia.description || 'Sem descrição disponível',
+        category: noticia.category ? noticia.category.join(', ') : 'Geral',
+        source: noticia.source_id || 'Fonte desconhecida',
+        date: noticia.pubDate || new Date().toISOString(),
+        image: noticia.image_url || 'https://via.placeholder.com/400x200?text=Sem+Imagem',
+        link: noticia.link || '#'
+      }));
+
+      // Se houver um elemento para mostrar notícias na página principal
+      if (document.getElementById('lista-noticias')) {
+        mostrarNoticias(noticias);
+      }
     } else {
-      listaNoticias.innerHTML = `
-        <div class="col-span-full text-center py-8">
-          <i class="fas fa-newspaper text-4xl text-text-light mb-2"></i>
-          <p class="text-text-light">Nenhuma notícia encontrada para sua região</p>
-          <button onclick="window.location.reload()" 
-                  class="mt-4 px-4 py-2 bg-primary-color text-white rounded-lg hover:bg-blue-600 transition-colors">
-            Tentar novamente
-          </button>
-        </div>
-      `;
+      console.warn('Nenhuma notícia encontrada para a região');
+      // Fallback para notícias padrão
+      window.newsData = [{
+        title: "Notícias não disponíveis",
+        content: "Não foi possível carregar as notícias no momento.",
+        category: "Informação",
+        source: "Sistema",
+        date: new Date().toISOString()
+      }];
     }
   } catch (error) {
     console.error('Erro ao carregar notícias:', error);
-    listaNoticias.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <i class="fas fa-exclamation-triangle text-4xl text-accent-color mb-2"></i>
-        <p class="text-text-color">Erro ao carregar notícias</p>
-        <button onclick="window.location.reload()" 
-                class="mt-4 px-4 py-2 bg-primary-color text-white rounded-lg hover:bg-blue-600 transition-colors">
-          Tentar novamente
-        </button>
-      </div>
-    `;
+    // Fallback para notícias padrão em caso de erro
+    window.newsData = [{
+      title: "Erro ao carregar notícias",
+      content: "O serviço de notícias está temporariamente indisponível.",
+      category: "Erro",
+      source: "Sistema",
+      date: new Date().toISOString()
+    }];
   }
-});
+})();
 
+// Função para obter notícias da API
 async function getNoticias(countryCode) {
   try {
     const url = `https://newsdata.io/api/1/news?apikey=${API_KEY}&country=${countryCode}&language=pt`;
@@ -71,11 +77,13 @@ async function getNoticias(countryCode) {
   }
 }
 
+// Função para exibir notícias na página (se necessário)
 function mostrarNoticias(noticias) {
   const lista = document.getElementById('lista-noticias');
+  if (!lista) return;
+
   lista.innerHTML = '';
 
-  // Limitar a 6 notícias para melhor layout
   noticias.slice(0, 6).forEach(noticia => {
     const article = document.createElement('article');
     article.className = 'bg-card-color rounded-lg overflow-hidden shadow-md border border-border-color hover:shadow-lg transition-shadow duration-300 h-full flex flex-col';
@@ -116,3 +124,19 @@ function mostrarNoticias(noticias) {
     lista.appendChild(article);
   });
 }
+
+// Função para obter uma notícia aleatória para o pop-up
+window.getRandomNews = function() {
+  if (window.newsData.length === 0) {
+    return {
+      title: "Notícias não disponíveis",
+      content: "Não foi possível carregar as notícias no momento.",
+      category: "Informação",
+      source: "Sistema",
+      date: new Date().toISOString()
+    };
+  }
+  
+  const randomIndex = Math.floor(Math.random() * window.newsData.length);
+  return window.newsData[randomIndex];
+};
