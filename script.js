@@ -575,7 +575,7 @@ async function downloadVideo() {
       const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }) // Envia apenas a URL
+        body: JSON.stringify({ url, format }) // Envia tanto URL quanto formato
       });
       
       if (!response.ok) {
