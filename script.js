@@ -165,27 +165,29 @@ function closeNewsPopupHandler() {
 }
 
 function initProgressTracking() {
-  // Fecha qualquer conexão anterior
   if (progressSource) progressSource.close();
   
   progressSource = new EventSource(`${API_BASE_URL}/download/progress`);
   
-  progressSource.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    updateProgressBar(data.progress);
-    
-    if (data.download) {
-      handleDownload(data.download);
+  progressSource.addEventListener('progress', (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      updateProgressBar(data.progress);
+      
+      if (data.download) {
+        handleDownload(data.download);
+      }
+      
+      if (data.message) {
+        updatePopupProgress(data.progress, data.message);
+      }
+    } catch (error) {
+      console.error('Erro ao processar evento:', error);
     }
-    
-    if (data.message) {
-      updatePopupProgress(data.progress, data.message);
-    }
-  };
+  });
   
   progressSource.onerror = (e) => {
     console.error('Erro na conexão de progresso:', e);
-    // Tentar reconectar após 5 segundos
     setTimeout(initProgressTracking, 5000);
   };
 }
