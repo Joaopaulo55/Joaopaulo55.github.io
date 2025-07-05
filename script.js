@@ -552,6 +552,7 @@ async function downloadVideo() {
   const urlInput = el('url');
   const formats = el('formats');
   const downloadButton = el('download');
+  const progressContainer = el('progressContainer');
   
   if (!urlInput || !formats || !downloadButton) return;
 
@@ -568,18 +569,13 @@ async function downloadVideo() {
   showStatus('Preparando download...', 'info');
   downloadButton.disabled = true;
   downloadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando';
+  if (progressContainer) progressContainer.classList.remove('hidden');
 
   try {
-    // Simula progresso enquanto faz a requisição
-    simulateDownloadProgress();
-    
     const response = await fetchWithTimeout(`${API_BASE_URL}/download`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        url: url,
-        format: format // Garante que o formato está sendo enviado
-      })
+      body: JSON.stringify({ url, format })
     });
     
     if (!response.ok) {
@@ -588,32 +584,24 @@ async function downloadVideo() {
     }
     
     const data = await response.json();
-    
-    if (!data.download) {
-      throw new Error('URL de download não recebida do servidor');
-    }
-    
-    // Abre o download em uma nova aba
     window.open(data.download, '_blank');
     
-    // Atualiza a UI
-    downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
-    showStatus('Download concluído!', 'success');
+    showStatus('Redirecionando para download...', 'success');
+    simulateDownloadProgress();
     
-    // Fecha o popup após 2 segundos
     setTimeout(() => {
-      if (progressPopup) progressPopup.classList.add('hidden');
+      downloadButton.innerHTML = '<i class="fas fa-redo"></i> <span class="btn-text">Baixar Novamente</span>';
     }, 2000);
     
   } catch (error) {
     showStatus(error.message || 'Erro durante o download', 'error');
     console.error('Erro no download:', error);
-    
-    // Reseta a UI em caso de erro
+    const progressBar = el('progressBar');
+    if (progressBar) progressBar.style.width = '0%';
     if (progressPopup) progressPopup.classList.add('hidden');
-    downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
   } finally {
     downloadButton.disabled = false;
+    downloadButton.innerHTML = '<i class="fas fa-download"></i> <span class="btn-text">Baixar</span>';
   }
 }
 
