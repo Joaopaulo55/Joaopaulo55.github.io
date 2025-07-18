@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Y2Mate Clone - João Paulo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Downloader Universal (Y2Mate Clone)</h1>
+
+    <input type="text" id="searchInput" placeholder="Digite nome ou cole o link">
+    <button onclick="search()">Buscar</button>
+
+    <div id="results"></div>
+
+    <hr>
+    <h2>Baixar diretamente por link</h2>
+    <input type="text" id="directLink" placeholder="https://...">
+    <select id="formatSelect">
+      <option value="video">Vídeo (MP4)</option>
+      <option value="audio">Áudio (MP3)</option>
+    </select>
+    <button onclick="directDownload()">Download Direto</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
