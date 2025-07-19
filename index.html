@@ -1,29 +1,293 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Y2Mate Clone - João Paulo</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bdownzy - Download Videos from Multiple Platforms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <div class="container">
-    <h1>Downloader Universal (Y2Mate Clone)</h1>
+    <div class="app-container">
+        <!-- Header/Navigation -->
+        <header class="app-header">
+            <div class="header-container">
+                <div class="logo-container">
+                    <h1 class="logo">Bdownzy</h1>
+                    <span class="beta-tag">BETA</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="#" class="nav-link active" data-section="home"><i class="fas fa-home"></i> Home</a>
+                    <a href="#" class="nav-link" data-section="features"><i class="fas fa-star"></i> Features</a>
+                    <a href="#" class="nav-link" data-section="about"><i class="fas fa-info-circle"></i> About</a>
+                </nav>
+                <div class="auth-buttons">
+                    <button id="youtube-auth-btn" class="btn btn-outline"><i class="fab fa-youtube"></i> YouTube Login</button>
+                </div>
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
 
-    <input type="text" id="searchInput" placeholder="Digite nome ou cole o link">
-    <button onclick="search()">Buscar</button>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#" class="mobile-nav-link active" data-section="home"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="mobile-nav-link" data-section="features"><i class="fas fa-star"></i> Features</a>
+            <a href="#" class="mobile-nav-link" data-section="about"><i class="fas fa-info-circle"></i> About</a>
+            <button id="mobile-youtube-auth-btn" class="btn btn-outline"><i class="fab fa-youtube"></i> YouTube Login</button>
+        </div>
 
-    <div id="results"></div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section" id="home">
+                <div class="hero-container">
+                    <div class="hero-text">
+                        <h2>Download Videos from Multiple Platforms</h2>
+                        <p>Bdownzy supports YouTube, Vimeo, TikTok, Instagram and more with high quality downloads.</p>
+                        <div class="hero-search">
+                            <div class="search-container">
+                                <input type="text" id="video-url" placeholder="Paste video URL here..." autocomplete="off">
+                                <button id="search-btn" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Analyze
+                                </button>
+                            </div>
+                            <div class="platform-tags">
+                                <span class="platform-tag"><i class="fab fa-youtube"></i> YouTube</span>
+                                <span class="platform-tag"><i class="fab fa-vimeo-v"></i> Vimeo</span>
+                                <span class="platform-tag"><i class="fab fa-tiktok"></i> TikTok</span>
+                                <span class="platform-tag"><i class="fab fa-instagram"></i> Instagram</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://via.placeholder.com/600x400" alt="Bdownzy interface preview" class="hero-img">
+                    </div>
+                </div>
+            </section>
 
-    <hr>
-    <h2>Baixar diretamente por link</h2>
-    <input type="text" id="directLink" placeholder="https://...">
-    <select id="formatSelect">
-      <option value="video">Vídeo (MP4)</option>
-      <option value="audio">Áudio (MP3)</option>
-    </select>
-    <button onclick="directDownload()">Download Direto</button>
-  </div>
+            <!-- Video Info Section (hidden by default) -->
+            <section class="video-info-section" id="video-info" style="display: none;">
+                <div class="video-info-container">
+                    <div class="video-thumbnail-container">
+                        <img id="video-thumbnail" src="" alt="Video thumbnail" class="video-thumbnail">
+                        <div class="video-duration" id="video-duration"></div>
+                    </div>
+                    <div class="video-details">
+                        <h3 id="video-title"></h3>
+                        <p id="video-channel" class="video-channel"></p>
+                        <p id="video-description" class="video-description"></p>
+                        
+                        <div class="download-options">
+                            <div class="download-option-tabs">
+                                <button class="tab-btn active" data-format="video"><i class="fas fa-video"></i> Video</button>
+                                <button class="tab-btn" data-format="audio"><i class="fas fa-music"></i> Audio</button>
+                                <button class="tab-btn" data-format="url"><i class="fas fa-link"></i> Direct URL</button>
+                            </div>
+                            
+                            <div class="format-options" id="video-format-options">
+                                <div class="quality-selector">
+                                    <label for="video-quality">Quality:</label>
+                                    <select id="video-quality" class="quality-dropdown">
+                                        <!-- Filled dynamically -->
+                                    </select>
+                                </div>
+                                <button id="download-video-btn" class="btn btn-primary download-btn">
+                                    <i class="fas fa-download"></i> Download Video
+                                </button>
+                            </div>
+                            
+                            <div class="format-options" id="audio-format-options" style="display: none;">
+                                <div class="quality-selector">
+                                    <label for="audio-quality">Quality:</label>
+                                    <select id="audio-quality" class="quality-dropdown">
+                                        <option value="best">Best Quality</option>
+                                        <option value="192">192kbps</option>
+                                        <option value="128">128kbps</option>
+                                        <option value="64">64kbps</option>
+                                    </select>
+                                </div>
+                                <button id="download-audio-btn" class="btn btn-primary download-btn">
+                                    <i class="fas fa-download"></i> Download Audio
+                                </button>
+                            </div>
+                            
+                            <div class="format-options" id="url-format-options" style="display: none;">
+                                <div class="quality-selector">
+                                    <label for="url-quality">Quality:</label>
+                                    <select id="url-quality" class="quality-dropdown">
+                                        <!-- Filled dynamically -->
+                                    </select>
+                                </div>
+                                <button id="copy-url-btn" class="btn btn-outline">
+                                    <i class="fas fa-copy"></i> Copy URL
+                                </button>
+                                <a id="direct-url-link" href="#" target="_blank" class="btn btn-primary">
+                                    <i class="fas fa-external-link-alt"></i> Open URL
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-  <script src="script.js"></script>
+            <!-- YouTube Search Section -->
+            <section class="youtube-search-section" id="youtube-search" style="display: none;">
+                <div class="section-header">
+                    <h3>YouTube Search Results</h3>
+                    <div class="search-controls">
+                        <input type="text" id="youtube-search-query" placeholder="Search YouTube..." class="search-input">
+                        <button id="youtube-search-btn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="video-grid" id="youtube-results">
+                    <!-- Filled dynamically -->
+                </div>
+                <div class="pagination-controls">
+                    <button id="prev-page-btn" class="btn btn-outline" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+                    <span id="page-info">Page 1</span>
+                    <button id="next-page-btn" class="btn btn-outline" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section" id="features">
+                <h2 class="section-title">Why Choose Bdownzy?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Fast Downloads</h3>
+                        <p>High-speed downloads with our optimized servers and direct streaming technology.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Secure</h3>
+                        <p>No malware or viruses. We respect your privacy and device security.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <h3>Multiple Platforms</h3>
+                        <p>Supports YouTube, Vimeo, TikTok, Instagram and many more platforms.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>High Quality</h3>
+                        <p>Download videos in up to 4K resolution and audio in best quality.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="about-section" id="about">
+                <h2 class="section-title">About Bdownzy</h2>
+                <div class="about-content">
+                    <p>Bdownzy is a modern, user-friendly video downloader that supports multiple platforms. Our mission is to provide a seamless experience for downloading videos for personal use.</p>
+                    <p>This service is completely free to use and doesn't require any registration. We respect copyright laws and encourage users to only download content they have rights to.</p>
+                    <div class="disclaimer">
+                        <h4>Disclaimer</h4>
+                        <p>Bdownzy is intended for personal use only. Please respect copyright laws and only download videos you have permission to access.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <h2>Bdownzy</h2>
+                    <p>Your multi-platform video downloader</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Product</h4>
+                        <a href="#">Features</a>
+                        <a href="#">How it works</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Company</h4>
+                        <a href="#">About</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <a href="#">Contact Us</a>
+                        <a href="#">Report Issue</a>
+                        <a href="#">Status</a>
+                    </div>
+                </div>
+                <div class="footer-social">
+                    <h4>Follow Us</h4>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Bdownzy. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- Loading Modal -->
+        <div class="modal" id="loading-modal">
+            <div class="modal-content">
+                <div class="loader">
+                    <div class="loader-spinner"></div>
+                    <p id="loading-text">Processing your request...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Auth Modal -->
+        <div class="modal" id="youtube-auth-modal">
+            <div class="modal-content">
+                <button class="close-modal" id="close-auth-modal">&times;</button>
+                <h3>YouTube Authentication</h3>
+                <p>To access restricted YouTube content, please paste your YouTube cookies below:</p>
+                <textarea id="youtube-cookies" placeholder="Paste YouTube cookies here..."></textarea>
+                <div class="modal-buttons">
+                    <button id="submit-cookies-btn" class="btn btn-primary">Submit</button>
+                    <button id="logout-yt-btn" class="btn btn-outline">Logout</button>
+                </div>
+                <div class="auth-instructions">
+                    <h4>How to get YouTube cookies:</h4>
+                    <ol>
+                        <li>Open YouTube in your browser and log in</li>
+                        <li>Open Developer Tools (F12 or right-click → Inspect)</li>
+                        <li>Go to Application → Cookies</li>
+                        <li>Copy the cookie values for YouTube</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Toast -->
+        <div class="toast" id="error-toast">
+            <div class="toast-content">
+                <i class="fas fa-exclamation-circle toast-icon"></i>
+                <p id="toast-message"></p>
+            </div>
+            <button class="toast-close">&times;</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
